@@ -2,8 +2,8 @@
 import AdminLayout from '../../../layouts/AdminLayout.astro';
 import { getCars } from '../../../lib/db';
 
-const { DB } = Astro.locals.runtime.env;
-const { results: cars } = await getCars(DB, { status: undefined, limit: 100 });
+const DB = Astro.locals.runtime?.env?.DB;
+const cars = DB ? (await getCars(DB, { status: undefined, limit: 100 } as any)).results : [];
 
 const deleted = Astro.url.searchParams.get('deleted');
 const saved = Astro.url.searchParams.get('saved');

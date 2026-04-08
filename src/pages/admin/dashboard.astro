@@ -2,22 +2,30 @@
 import AdminLayout from '../../layouts/AdminLayout.astro';
 import { getCars, getBlogPosts, getFormSubmissions } from '../../lib/db';
 
-const { DB } = Astro.locals.runtime.env;
+const DB = Astro.locals.runtime?.env?.DB;
 
-const [carsRes, postsRes, submissionsRes] = await Promise.all([
-  DB.prepare('SELECT COUNT(*) as total FROM cars').first<{ total: number }>(),
-  DB.prepare('SELECT COUNT(*) as total FROM blog_posts WHERE status = \'published\'').first<{ total: number }>(),
-  DB.prepare('SELECT COUNT(*) as total FROM form_submissions WHERE read_at IS NULL').first<{ total: number }>(),
-]);
-
-const stats = [
-  { label: 'Mașini disponibile', value: carsRes?.total ?? 0, icon: '🚗', href: '/admin/masini' },
-  { label: 'Articole blog', value: postsRes?.total ?? 0, icon: '📝', href: '/admin/blog' },
-  { label: 'Formulare necitite', value: submissionsRes?.total ?? 0, icon: '📬', href: '/admin/submissions' },
+let stats = [
+  { label: 'Mașini disponibile', value: 0, icon: '🚗', href: '/admin/masini' },
+  { label: 'Articole blog', value: 0, icon: '📝', href: '/admin/blog' },
+  { label: 'Formulare necitite', value: 0, icon: '📬', href: '/admin/submissions' },
 ];
+let recentCars: any[] = [];
+let recentSubmissions: any[] = [];
 
-const { results: recentCars } = await getCars(DB, { limit: 5, status: undefined });
-const { results: recentSubmissions } = await getFormSubmissions(DB, undefined, 5);
+if (DB) {
+  const [carsRes, postsRes, submissionsRes] = await Promise.all([
+    DB.prepare('SELECT COUNT(*) as total FROM cars').first<{ total: number }>(),
+    DB.prepare("SELECT COUNT(*) as total FROM blog_posts WHERE status = 'published'").first<{ total: number }>(),
+    DB.prepare('SELECT COUNT(*) as total FROM form_submissions WHERE read_at IS NULL').first<{ total: number }>(),
+  ]);
+  stats = [
+    { label: 'Mașini disponibile', value: carsRes?.total ?? 0, icon: '🚗', href: '/admin/masini' },
+    { label: 'Articole blog', value: postsRes?.total ?? 0, icon: '📝', href: '/admin/blog' },
+    { label: 'Formulare necitite', value: submissionsRes?.total ?? 0, icon: '📬', href: '/admin/submissions' },
+  ];
+  recentCars = (await getCars(DB, { limit: 5, status: undefined } as any)).results;
+  recentSubmissions = (await getFormSubmissions(DB, undefined, 5)).results;
+}
 ---
 
 <AdminLayout title="Dashboard">

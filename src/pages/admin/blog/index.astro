@@ -2,9 +2,8 @@
 import AdminLayout from '../../../layouts/AdminLayout.astro';
 import { getBlogPosts } from '../../../lib/db';
 
-const { DB } = Astro.locals.runtime.env;
-const { results: posts } = await getBlogPosts(DB, undefined, 100);
-// @ts-ignore - pass undefined to get all statuses
+const DB = Astro.locals.runtime?.env?.DB;
+if (!DB) return Astro.redirect('/admin/login');
 const { results: allPosts } = await DB.prepare('SELECT * FROM blog_posts ORDER BY created_at DESC LIMIT 100').all();
 
 const deleted = Astro.url.searchParams.get('deleted');

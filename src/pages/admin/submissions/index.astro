@@ -2,7 +2,8 @@
 import AdminLayout from '../../../layouts/AdminLayout.astro';
 import { getFormSubmissions, markSubmissionRead } from '../../../lib/db';
 
-const { DB } = Astro.locals.runtime.env;
+const DB = Astro.locals.runtime?.env?.DB;
+if (!DB) return Astro.redirect('/admin/login');
 
 const filterType = Astro.url.searchParams.get('type') || '';
 const { results: submissions } = await getFormSubmissions(DB, filterType || undefined, 100);

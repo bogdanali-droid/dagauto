@@ -3,7 +3,8 @@ import '../../styles/global.css';
 import { getUserByUsername } from '../../lib/db';
 import { hashPassword, createSessionToken, setSessionCookie, getSessionToken, verifySessionToken } from '../../lib/auth';
 
-const { DB, SESSION_SECRET } = Astro.locals.runtime.env;
+const DB = Astro.locals.runtime?.env?.DB;
+const SESSION_SECRET = Astro.locals.runtime?.env?.SESSION_SECRET;
 const secret = SESSION_SECRET || 'dev-secret-change-in-prod';
 
 // Already logged in?
@@ -19,19 +20,22 @@ if (Astro.request.method === 'POST') {
   const data = await Astro.request.formData();
   const username = data.get('username') as string;
   const password = data.get('password') as string;
+  const rememberMe = data.get('remember_me') === 'on';
 
-  const user = await getUserByUsername(DB, username);
-  if (user) {
-    const hash = await hashPassword(password);
-    if (hash === user.password_hash) {
-      const token = await createSessionToken(user.id, secret);
-      return new Response(null, {
-        status: 302,
-        headers: {
-          'Location': '/admin/dashboard',
-          'Set-Cookie': setSessionCookie(token),
-        },
-      });
+  if (DB) {
+    const user = await getUserByUsername(DB, username);
+    if (user) {
+      const hash = await hashPassword(password);
+      if (hash === user.password_hash) {
+        const token = await createSessionToken(user.id, secret);
+        return new Response(null, {
+          status: 302,
+          headers: {
+            'Location': '/admin/dashboard',
+            'Set-Cookie': setSessionCookie(token, rememberMe),
+          },
+        });
+      }
     }
   }
   error = 'Utilizator sau parolă incorectă.';
@@ -75,6 +79,10 @@ if (Astro.request.method === 'POST') {
         <div>
           <label class="form-label">Parolă</label>
           <input type="password" name="password" required class="form-input" autocomplete="current-password" />
+        </div>
+        <div class="flex items-center gap-2">
+          <input type="checkbox" name="remember_me" id="remember_me" class="w-4 h-4 accent-orange-500" />
+          <label for="remember_me" class="text-sm text-gray-600 cursor-pointer">Ține-mă minte 30 zile</label>
         </div>
         <button type="submit" class="btn-primary w-full">
           Intră în cont →

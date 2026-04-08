@@ -1,5 +1,6 @@
 const SESSION_COOKIE = 'dagauto_session';
 const SESSION_DURATION = 60 * 60 * 24 * 7; // 7 days in seconds
+const SESSION_DURATION_LONG = 60 * 60 * 24 * 30; // 30 days (remember me)
 
 async function hmacSign(secret: string, data: string): Promise<string> {
   const encoder = new TextEncoder();
@@ -49,8 +50,9 @@ export async function verifySessionToken(token: string, secret: string): Promise
   }
 }
 
-export function setSessionCookie(token: string): string {
-  return `${SESSION_COOKIE}=${token}; HttpOnly; Secure; SameSite=Lax; Path=/; Max-Age=${SESSION_DURATION}`;
+export function setSessionCookie(token: string, rememberMe = false): string {
+  const duration = rememberMe ? SESSION_DURATION_LONG : SESSION_DURATION;
+  return `${SESSION_COOKIE}=${token}; HttpOnly; Secure; SameSite=Lax; Path=/; Max-Age=${duration}`;
 }
 
 export function clearSessionCookie(): string {

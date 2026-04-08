@@ -2,7 +2,7 @@
 import AdminLayout from '../../../../layouts/AdminLayout.astro';
 import { getBlogPostById, updateBlogPost } from '../../../../lib/db';
 
-const { DB } = Astro.locals.runtime.env;
+const DB = Astro.locals.runtime?.env?.DB;
 const id = Number(Astro.params.id);
 
 const post = await getBlogPostById(DB, id);

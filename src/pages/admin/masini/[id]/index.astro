@@ -2,7 +2,7 @@
 import AdminLayout from '../../../../layouts/AdminLayout.astro';
 import { getCarById, getCarImages, updateCar } from '../../../../lib/db';
 
-const { DB } = Astro.locals.runtime.env;
+const DB = Astro.locals.runtime?.env?.DB;
 const id = Number(Astro.params.id);
 
 const car = await getCarById(DB, id);

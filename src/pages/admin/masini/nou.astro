@@ -2,7 +2,7 @@
 import AdminLayout from '../../../layouts/AdminLayout.astro';
 import { createCar, generateSlug } from '../../../lib/db';
 
-const { DB } = Astro.locals.runtime.env;
+const DB = Astro.locals.runtime?.env?.DB;
 let error = '';
 
 if (Astro.request.method === 'POST') {

@@ -47,7 +47,7 @@ if (Astro.request.method === 'POST') {
     <!-- Images section -->
     <div class="bg-white rounded-xl shadow-sm p-6">
       <h2 class="font-semibold text-gray-700 border-b pb-2 mb-4">Imagini ({images.length})</h2>
-      <div class="grid grid-cols-3 sm:grid-cols-5 gap-3 mb-4">
+      <div id="img-grid" class="grid grid-cols-3 sm:grid-cols-5 gap-3 mb-4">
         {images.map(img => (
           <div class="relative group">
             <img src={img.image_url} alt="" class="w-full aspect-square object-cover rounded-lg" />
@@ -62,22 +62,26 @@ if (Astro.request.method === 'POST') {
           </div>
         ))}
         {images.length === 0 && (
-          <div class="col-span-5 text-sm text-gray-400 py-4 text-center">Nicio imagine adăugată.</div>
+          <div class="col-span-5 text-sm text-gray-400 py-4 text-center" data-no-images>Nicio imagine adăugată.</div>
         )}
       </div>
 
-      <!-- Upload form -->
-      <form id="upload-form" class="flex items-center gap-3">
-        <input type="file" id="image-file" name="file" accept="image/*" multiple class="form-input text-sm" />
-        <label class="flex items-center gap-1 text-sm text-gray-600">
-          <input type="checkbox" id="is-primary" class="mr-1" />
-          Principală
-        </label>
-        <button type="button" onclick="uploadImages()" class="btn-secondary text-sm py-2">
-          Încarcă
-        </button>
-      </form>
-      <p id="upload-status" class="text-sm mt-2"></p>
+      <!-- Upload zone -->
+      <div
+        id="drop-zone"
+        class="border-2 border-dashed border-gray-300 rounded-xl p-8 text-center cursor-pointer hover:border-orange-400 hover:bg-orange-50 transition-colors"
+        onclick="document.getElementById('image-file').click()"
+        ondragover="event.preventDefault();this.classList.add('border-orange-400','bg-orange-50')"
+        ondragleave="this.classList.remove('border-orange-400','bg-orange-50')"
+        ondrop="handleDrop(event)"
+      >
+        <div class="text-4xl mb-2">📁</div>
+        <p class="font-semibold text-gray-700">Trage pozele aici sau apasă pentru a selecta</p>
+        <p class="text-sm text-gray-400 mt-1">JPG, PNG, WEBP — max 10MB per poză — multiple simultan</p>
+        <input type="file" id="image-file" name="file" accept="image/*" multiple class="hidden" onchange="uploadImages(this.files)" />
+      </div>
+      <div id="upload-progress" class="hidden mt-3 space-y-1"></div>
+      <p id="upload-status" class="text-sm mt-2 font-medium"></p>
     </div>
 
     <!-- Edit form -->
@@ -194,30 +198,57 @@ if (Astro.request.method === 'POST') {
 </AdminLayout>
 
 <script define:vars={{ carId: id }}>
-async function uploadImages() {
-  const fileInput = document.getElementById('image-file');
-  const isPrimary = document.getElementById('is-primary').checked;
+function handleDrop(e) {
+  e.preventDefault();
+  document.getElementById('drop-zone').classList.remove('border-orange-400','bg-orange-50');
+  const files = e.dataTransfer?.files;
+  if (files && files.length > 0) uploadImages(files);
+}
+
+async function uploadImages(files) {
+  if (!files) files = document.getElementById('image-file').files;
   const status = document.getElementById('upload-status');
-  const files = fileInput.files;
-  if (!files || files.length === 0) {
-    status.textContent = 'Selectează cel puțin o imagine.';
-    return;
-  }
-  status.textContent = 'Se încarcă...';
+  const progress = document.getElementById('upload-progress');
+  if (!files || files.length === 0) return;
+
+  const noImages = document.querySelector('[data-no-images]');
+  if (noImages) noImages.remove();
+
+  progress.classList.remove('hidden');
+  status.textContent = '';
+
+  // Check if car has images already (for is_primary logic)
+  const hasImages = document.querySelectorAll('#img-grid > div').length > 0;
+
   for (let i = 0; i < files.length; i++) {
+    const bar = document.createElement('div');
+    bar.className = 'flex items-center gap-2 text-sm';
+    bar.innerHTML = `<span class="truncate max-w-xs text-gray-600">${files[i].name}</span><span class="text-orange-500 animate-pulse">Se încarcă...</span>`;
+    progress.appendChild(bar);
+
     const fd = new FormData();
     fd.append('file', files[i]);
     fd.append('car_id', String(carId));
-    fd.append('is_primary', String(i === 0 && isPrimary));
+    fd.append('is_primary', String(!hasImages && i === 0 ? 'true' : 'false'));
     fd.append('sort_order', String(i));
+
     const res = await fetch('/api/upload-image', { method: 'POST', body: fd });
-    if (!res.ok) {
-      status.textContent = 'Eroare la încărcare.';
-      return;
+    if (res.ok) {
+      const data = await res.json();
+      bar.innerHTML = `<span class="truncate max-w-xs text-gray-600">${files[i].name}</span><span class="text-green-600">✓ Ok</span>`;
+      // Add thumbnail to grid immediately
+      const grid = document.getElementById('img-grid');
+      const div = document.createElement('div');
+      div.className = 'relative group';
+      div.innerHTML = `<img src="${data.url}" class="w-full aspect-square object-cover rounded-lg" />${!hasImages && i === 0 ? '<span class="absolute top-1 left-1 bg-orange-500 text-white text-xs px-1.5 py-0.5 rounded">Principal</span>' : ''}`;
+      grid?.appendChild(div);
+    } else {
+      bar.innerHTML = `<span class="truncate max-w-xs text-gray-600">${files[i].name}</span><span class="text-red-500">✗ Eroare</span>`;
     }
   }
-  status.textContent = 'Imagini încărcate cu succes!';
-  setTimeout(() => location.reload(), 1000);
+  status.textContent = '✅ Toate pozele au fost încărcate!';
+  status.className = 'text-sm mt-2 font-medium text-green-600';
+  setTimeout(() => { progress.classList.add('hidden'); progress.innerHTML = ''; status.textContent = ''; }, 3000);
 }
 
 async function deleteImage(imageId) {

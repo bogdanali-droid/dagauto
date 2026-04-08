@@ -30,17 +30,7 @@ if (Astro.request.method === 'POST') {
     ).run();
 
     const newCar = await DB.prepare('SELECT id FROM cars ORDER BY id DESC LIMIT 1').first<{ id: number }>();
-    const carId = newCar?.id;
-
-    // Insert images from textarea (one URL per line)
-    const imagesRaw = (data.get('images') as string) || '';
-    const imageUrls = imagesRaw.split('\n').map(u => u.trim()).filter(u => u.length > 0);
-    for (let i = 0; i < imageUrls.length; i++) {
-      await DB.prepare('INSERT INTO car_images (car_id, image_url, is_primary, sort_order) VALUES (?, ?, ?, ?)')
-        .bind(carId, imageUrls[i], i === 0 ? 1 : 0, i).run();
-    }
-
-    return Astro.redirect(`/admin/masini/${carId}?saved=1`);
+    return Astro.redirect(`/admin/masini/${newCar?.id}?saved=1`);
   } catch (e) {
     error = 'Eroare la salvare. Verifică datele introduse.';
   }
@@ -160,17 +150,12 @@ if (Astro.request.method === 'POST') {
         </div>
       </div>
 
-      <div class="bg-white rounded-xl shadow-sm p-6 space-y-4">
-        <h2 class="font-semibold text-gray-700 border-b pb-2">Fotografii</h2>
-        <p class="text-sm text-gray-500">Adaugă URL-urile pozelor, <strong>câte unul pe linie</strong>. Prima poză va fi cea principală (thumbnail).</p>
-        <textarea
-          name="images"
-          rows="6"
-          class="form-input resize-none font-mono text-sm"
-          placeholder="https://exemplu.ro/poza1.jpg&#10;https://exemplu.ro/poza2.jpg&#10;https://exemplu.ro/poza3.jpg"
-        ></textarea>
-        <div id="img-preview" class="grid grid-cols-3 sm:grid-cols-5 gap-2 mt-2"></div>
-        <p class="text-xs text-gray-400">💡 Poți folosi link-uri de pe Google Drive, WhatsApp Web, sau orice hosting de imagini.</p>
+      <div class="bg-blue-50 border border-blue-200 rounded-xl p-5 flex gap-4 items-start">
+        <div class="text-3xl">📸</div>
+        <div>
+          <p class="font-semibold text-blue-800 mb-1">Fotografiile se adaugă după salvare</p>
+          <p class="text-sm text-blue-700">Completează datele mașinii și apasă <strong>Salvează</strong>. Pe pagina următoare vei putea încărca fotografii direct de pe calculator — multiple poze simultan, drag &amp; drop.</p>
+        </div>
       </div>
 
       <div class="bg-white rounded-xl shadow-sm p-6">
@@ -188,20 +173,4 @@ if (Astro.request.method === 'POST') {
       </div>
     </form>
   </div>
-<script>
-  const textarea = document.querySelector('textarea[name="images"]') as HTMLTextAreaElement;
-  const preview = document.getElementById('img-preview')!;
-
-  function updatePreview() {
-    const urls = textarea.value.split('\n').map(u => u.trim()).filter(u => u.startsWith('http'));
-    preview.innerHTML = urls.map((url, i) => `
-      <div class="relative">
-        <img src="${url}" alt="Poza ${i+1}" class="w-full h-20 object-cover rounded-lg border-2 ${i === 0 ? 'border-orange-400' : 'border-gray-200'}" onerror="this.parentElement.style.display='none'" />
-        ${i === 0 ? '<span class="absolute top-1 left-1 bg-orange-500 text-white text-xs px-1 rounded">Principal</span>' : ''}
-      </div>
-    `).join('');
-  }
-
-  textarea?.addEventListener('input', updatePreview);
-</script>
 </AdminLayout>

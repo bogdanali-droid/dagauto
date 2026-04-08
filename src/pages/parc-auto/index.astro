@@ -84,7 +84,7 @@ const hasFilters = Object.values(currentFilters).some(Boolean);
               {cars.length === perPage && (
                 <div class="text-center mt-8">
                   <a
-                    href={`/parc-auto?${new URLSearchParams({ ...Object.fromEntries(Object.entries(currentFilters).filter(([,v]) => v) as [string,string][]), page: String(page + 1) })}`}
+                    href={`/parc-auto?${new URLSearchParams({ ...Object.fromEntries(Object.entries(currentFilters).filter(([,v]) => Boolean(v))), page: String(page + 1) })}`}
                     class="btn-secondary"
                   >
                     Pagina Următoare →

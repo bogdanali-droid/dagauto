@@ -27,15 +27,26 @@ const formattedMileage = new Intl.NumberFormat('ro-RO').format(car.mileage);
 const hasDiscount = (car as any).old_price && (car as any).old_price > car.price;
 const discountPct = hasDiscount ? Math.round((1 - car.price / (car as any).old_price) * 100) : 0;
 
+const specIcons: Record<string, string> = {
+  'An fabricație': `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>`,
+  'Kilometraj': `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22a10 10 0 1 0 0-20 10 10 0 0 0 0 20z"/><path d="M7 13.5C7 11 9.2 9 12 9s5 2 5 4.5"/><path d="M12 9v0M8.5 11.5l2.5 1.5"/><circle cx="12" cy="14" r="1" fill="currentColor" stroke="none"/></svg>`,
+  'Combustibil': `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M3 22V6a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v16"/><path d="M3 22h12"/><path d="M9 22v-6"/><path d="M15 8h2a2 2 0 0 1 2 2v6a2 2 0 0 0 2 2v0a2 2 0 0 0 2-2V9l-3-3"/><path d="M18 5l2 2"/></svg>`,
+  'Transmisie': `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="5" cy="6" r="2"/><circle cx="19" cy="6" r="2"/><circle cx="12" cy="18" r="2"/><path d="M5 8v3a1 1 0 0 0 1 1h10a1 1 0 0 0 1-1V8"/><path d="M12 12v4"/></svg>`,
+  'Caroserie': `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17H4a2 2 0 0 1-2-2v-3l2-5h12l2 5v3a2 2 0 0 1-2 2h-3"/><circle cx="7.5" cy="17.5" r="2.5"/><circle cx="16.5" cy="17.5" r="2.5"/><path d="M6 9h12"/></svg>`,
+  'Culoare': `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="13.5" cy="6.5" r="2.5"/><circle cx="17.5" cy="10.5" r="2.5"/><circle cx="8.5" cy="7.5" r="2.5"/><circle cx="6.5" cy="12.5" r="2.5"/><path d="M12 22a7 7 0 1 1 0-14"/></svg>`,
+  'Motor': `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/><path d="M6 12h4m4 0h4M8 12v4m8-4v4"/></svg>`,
+  'Putere': `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>`,
+};
+
 const specs = [
-  { label: 'An fabricație', value: String(car.year), icon: '📅' },
-  { label: 'Kilometraj', value: `${formattedMileage} km`, icon: '🛣️' },
-  { label: 'Combustibil', value: car.fuel_type, icon: '⛽' },
-  { label: 'Transmisie', value: car.transmission, icon: '⚙️' },
-  { label: 'Caroserie', value: car.body_type, icon: '🚗' },
-  { label: 'Culoare', value: car.color, icon: '🎨' },
-  { label: 'Motor', value: car.engine_size, icon: '🔧' },
-  { label: 'Putere', value: car.power ? `${car.power} CP` : '-', icon: '⚡' },
+  { label: 'An fabricație', value: String(car.year) },
+  { label: 'Kilometraj', value: `${formattedMileage} km` },
+  { label: 'Combustibil', value: car.fuel_type },
+  { label: 'Transmisie', value: car.transmission },
+  { label: 'Caroserie', value: car.body_type },
+  { label: 'Culoare', value: car.color },
+  { label: 'Motor', value: car.engine_size },
+  { label: 'Putere', value: car.power ? `${car.power} CP` : '-' },
 ].filter(s => s.value && s.value !== '-' && s.value !== '0 CP');
 ---
 
@@ -192,10 +203,10 @@ const specs = [
             <div class="grid grid-cols-2 gap-3">
               {specs.map(s => (
                 <div class="flex items-center gap-3 border border-gray-100 rounded-lg p-3">
-                  <span class="text-xl">{s.icon}</span>
+                  <div class="w-9 h-9 flex-shrink-0 flex items-center justify-center rounded-lg bg-slate-50 text-slate-600" style="color:#1e3a5f;" set:html={specIcons[s.label] || ''} />
                   <div>
-                    <div class="text-xs text-gray-500">{s.label}</div>
-                    <div class="font-semibold text-gray-800 text-sm">{s.value}</div>
+                    <div class="text-xs text-gray-400 font-medium uppercase tracking-wide" style="font-size:10px;">{s.label}</div>
+                    <div class="font-semibold text-gray-900 text-sm mt-0.5">{s.value}</div>
                   </div>
                 </div>
               ))}

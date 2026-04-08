@@ -1,6 +1,5 @@
 ---
 import AdminLayout from '../../layouts/AdminLayout.astro';
-import { getCars, getBlogPosts, getFormSubmissions } from '../../lib/db';
 
 const DB = Astro.locals.runtime?.env?.DB;
 
@@ -11,25 +10,39 @@ let stats = [
 ];
 let recentCars: any[] = [];
 let recentSubmissions: any[] = [];
+let dbError = '';
 
-if (DB) {
-  const [carsRes, postsRes, submissionsRes] = await Promise.all([
-    DB.prepare('SELECT COUNT(*) as total FROM cars').first<{ total: number }>(),
-    DB.prepare("SELECT COUNT(*) as total FROM blog_posts WHERE status = 'published'").first<{ total: number }>(),
-    DB.prepare('SELECT COUNT(*) as total FROM form_submissions WHERE read_at IS NULL').first<{ total: number }>(),
-  ]);
-  stats = [
-    { label: 'Mașini disponibile', value: carsRes?.total ?? 0, icon: '🚗', href: '/admin/masini' },
-    { label: 'Articole blog', value: postsRes?.total ?? 0, icon: '📝', href: '/admin/blog' },
-    { label: 'Formulare necitite', value: submissionsRes?.total ?? 0, icon: '📬', href: '/admin/submissions' },
-  ];
-  recentCars = (await getCars(DB, { limit: 5, status: undefined } as any)).results;
-  recentSubmissions = (await getFormSubmissions(DB, undefined, 5)).results;
+try {
+  if (DB) {
+    const [carsRes, postsRes, submissionsRes] = await Promise.all([
+      DB.prepare('SELECT COUNT(*) as total FROM cars').first(),
+      DB.prepare('SELECT COUNT(*) as total FROM blog_posts').first(),
+      DB.prepare('SELECT COUNT(*) as total FROM form_submissions WHERE read_at IS NULL').first(),
+    ]);
+    stats = [
+      { label: 'Mașini disponibile', value: (carsRes as any)?.total ?? 0, icon: '🚗', href: '/admin/masini' },
+      { label: 'Articole blog', value: (postsRes as any)?.total ?? 0, icon: '📝', href: '/admin/blog' },
+      { label: 'Formulare necitite', value: (submissionsRes as any)?.total ?? 0, icon: '📬', href: '/admin/submissions' },
+    ];
+    const carsResult = await DB.prepare('SELECT id, title, price, status, slug FROM cars ORDER BY id DESC LIMIT 5').all();
+    recentCars = carsResult.results as any[];
+    const subsResult = await DB.prepare('SELECT id, form_type, created_at, read_at FROM form_submissions ORDER BY created_at DESC LIMIT 5').all();
+    recentSubmissions = subsResult.results as any[];
+  }
+} catch (e: any) {
+  dbError = e?.message || String(e);
+  console.error('Dashboard DB error:', e);
 }
 ---
 
 <AdminLayout title="Dashboard">
   <div class="space-y-8">
+    {dbError && (
+      <div class="bg-red-50 border border-red-200 text-red-700 rounded-lg p-4 text-sm">
+        ⚠️ Eroare DB: {dbError}
+      </div>
+    )}
+
     <!-- Stats -->
     <div class="grid grid-cols-1 sm:grid-cols-3 gap-6">
       {stats.map(s => (
@@ -70,7 +83,7 @@ if (DB) {
             </tr>
           </thead>
           <tbody class="divide-y divide-gray-100">
-            {recentCars.map(car => (
+            {recentCars.map((car: any) => (
               <tr class="hover:bg-gray-50">
                 <td class="px-6 py-4 font-medium text-gray-800">{car.title}</td>
                 <td class="px-6 py-4 text-gray-600">{new Intl.NumberFormat('ro-RO').format(car.price)} €</td>
@@ -83,12 +96,13 @@ if (DB) {
                 </td>
                 <td class="px-6 py-4">
                   <a href={`/admin/masini/${car.id}`} class="text-orange-500 hover:underline mr-3">Editează</a>
-                  <a href={`/parc-auto/${car.slug}`} target="_blank" class="text-gray-400 hover:text-gray-600">↗</a>
                 </td>
               </tr>
             ))}
             {recentCars.length === 0 && (
-              <tr><td colspan="4" class="px-6 py-8 text-center text-gray-400">Nicio mașină adăugată încă.</td></tr>
+              <tr><td colspan="4" class="px-6 py-8 text-center text-gray-400">
+                Nicio mașină adăugată. <a href="/admin/masini/nou" class="text-orange-500 underline">Adaugă →</a>
+              </td></tr>
             )}
           </tbody>
         </table>
@@ -111,7 +125,7 @@ if (DB) {
             </tr>
           </thead>
           <tbody class="divide-y divide-gray-100">
-            {recentSubmissions.map(sub => (
+            {recentSubmissions.map((sub: any) => (
               <tr class="hover:bg-gray-50">
                 <td class="px-6 py-4 font-medium text-gray-800">{sub.form_type}</td>
                 <td class="px-6 py-4 text-gray-600">{new Date(sub.created_at).toLocaleDateString('ro-RO')}</td>

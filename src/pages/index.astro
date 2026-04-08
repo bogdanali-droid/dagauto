@@ -4,11 +4,25 @@ import CarCard from '../components/CarCard.astro';
 import { getCars } from '../lib/db';
 
 let featuredCars: any[] = [];
+let topCars: any[] = [];
 try {
   const DB = Astro.locals.runtime?.env?.DB;
   if (DB) {
-    const result = await getCars(DB, { limit: 6 });
-    featuredCars = result.results;
+    // Featured/recommended cars
+    const featRes = await DB.prepare(
+      'SELECT c.*, ci.image_url as primary_image FROM cars c LEFT JOIN car_images ci ON c.id = ci.car_id AND ci.is_primary = 1 WHERE c.status = \'available\' AND c.featured = 1 ORDER BY c.created_at DESC LIMIT 6'
+    ).all();
+    featuredCars = featRes.results as any[];
+    // If no featured, show latest
+    if (featuredCars.length === 0) {
+      const latest = await getCars(DB, { limit: 6 });
+      featuredCars = latest.results;
+    }
+    // Top deals (with discount)
+    const deals = await DB.prepare(
+      'SELECT c.*, ci.image_url as primary_image FROM cars c LEFT JOIN car_images ci ON c.id = ci.car_id AND ci.is_primary = 1 WHERE c.status = \'available\' AND c.old_price > c.price ORDER BY (c.old_price - c.price) DESC LIMIT 3'
+    ).all();
+    topCars = deals.results as any[];
   }
 } catch (e) { console.error('DB error index:', e); }
 
@@ -83,18 +97,52 @@ const services = [
     </div>
   </section>
 
+  <!-- Top Deals (reduceri) -->
+  {topCars.length > 0 && (
+    <section class="py-12 bg-red-50">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex items-center justify-between mb-8">
+          <div>
+            <h2 class="text-2xl font-extrabold text-gray-900">🔥 Oferte Speciale</h2>
+            <p class="text-gray-500 text-sm">Prețuri reduse pentru vânzare rapidă</p>
+          </div>
+          <a href="/parc-auto" class="text-sm text-orange-500 font-semibold hover:underline">Vezi toate →</a>
+        </div>
+        <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          {topCars.map((car: any) => (
+            <CarCard
+              id={car.id} title={car.title} slug={car.slug}
+              make={car.make} model={car.model} year={car.year}
+              price={car.price} old_price={car.old_price}
+              mileage={car.mileage} fuel_type={car.fuel_type}
+              transmission={car.transmission} featured={car.featured}
+              primary_image={car.primary_image}
+            />
+          ))}
+        </div>
+      </div>
+    </section>
+  )}
+
   <!-- Featured Cars -->
   <section class="py-16 bg-gray-50">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <div class="text-center mb-10">
-        <h2 class="section-title">Mașini Disponibile</h2>
-        <p class="section-subtitle">Ultimele adăugiri în parcul nostru auto</p>
+        <h2 class="section-title">⭐ Mașini Recomandate</h2>
+        <p class="section-subtitle">Selecția noastră pentru tine</p>
       </div>
 
       {featuredCars.length > 0 ? (
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {featuredCars.map(car => (
-            <CarCard {...car} />
+          {featuredCars.map((car: any) => (
+            <CarCard
+              id={car.id} title={car.title} slug={car.slug}
+              make={car.make} model={car.model} year={car.year}
+              price={car.price} old_price={car.old_price}
+              mileage={car.mileage} fuel_type={car.fuel_type}
+              transmission={car.transmission} featured={car.featured}
+              primary_image={car.primary_image}
+            />
           ))}
         </div>
       ) : (
@@ -108,6 +156,22 @@ const services = [
         <a href="/parc-auto" class="btn-primary text-base px-10 py-4">
           Vezi Toate Mașinile →
         </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Trade-in Banner -->
+  <section class="py-10 bg-navy-900 text-white" style="background-color: #0f2244;">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex flex-col md:flex-row items-center justify-between gap-6">
+        <div>
+          <h2 class="text-2xl font-bold mb-1">🔄 Dai mașina veche, iei una nouă</h2>
+          <p class="text-gray-300">Evaluăm mașina ta pe loc. Preț corect, tranzacție rapidă.</p>
+        </div>
+        <div class="flex flex-wrap gap-3 shrink-0">
+          <a href="/contact" class="btn-primary">Solicită Evaluare</a>
+          <a href="tel:0721586534" class="btn-outline border-white text-white hover:bg-white hover:text-navy-900">📞 Sună Acum</a>
+        </div>
       </div>
     </div>
   </section>

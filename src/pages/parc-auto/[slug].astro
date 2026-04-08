@@ -1,6 +1,7 @@
 ---
 import Layout from '../../layouts/Layout.astro';
-import { getCarBySlug, getCarImages } from '../../lib/db';
+import CarCard from '../../components/CarCard.astro';
+import { getCarBySlug, getCarImages, getCars } from '../../lib/db';
 
 const { slug } = Astro.params;
 const DB = Astro.locals.runtime?.env?.DB;
@@ -13,9 +14,18 @@ const imagesResult = await getCarImages(DB, car.id);
 const images = imagesResult.results;
 const primaryImage = images.find(img => img.is_primary) || images[0];
 
+// Similar cars (same make, different car)
+let similarCars: any[] = [];
+try {
+  const sim = await getCars(DB, { make: car.make, limit: 4 });
+  similarCars = sim.results.filter((c: any) => c.id !== car.id).slice(0, 3);
+} catch {}
+
 const features = car.features ? car.features.split(',').map(f => f.trim()).filter(Boolean) : [];
 const formattedPrice = new Intl.NumberFormat('ro-RO').format(car.price);
 const formattedMileage = new Intl.NumberFormat('ro-RO').format(car.mileage);
+const hasDiscount = (car as any).old_price && (car as any).old_price > car.price;
+const discountPct = hasDiscount ? Math.round((1 - car.price / (car as any).old_price) * 100) : 0;
 
 const specs = [
   { label: 'An fabricație', value: String(car.year), icon: '📅' },
@@ -25,8 +35,8 @@ const specs = [
   { label: 'Caroserie', value: car.body_type, icon: '🚗' },
   { label: 'Culoare', value: car.color, icon: '🎨' },
   { label: 'Motor', value: car.engine_size, icon: '🔧' },
-  { label: 'Putere', value: `${car.power} CP`, icon: '⚡' },
-];
+  { label: 'Putere', value: car.power ? `${car.power} CP` : '-', icon: '⚡' },
+].filter(s => s.value && s.value !== '-' && s.value !== '0 CP');
 ---
 
 <Layout
@@ -34,30 +44,34 @@ const specs = [
   description={`${car.title}, ${car.year}, ${formattedMileage} km, ${car.fuel_type}. Preț: ${formattedPrice} €. Disponibil la DAG Auto Buzău.`}
   image={primaryImage?.image_url}
 >
-  <section class="bg-navy-900 text-white py-6" style="background-color: #0f2244;">
+  <!-- Breadcrumb -->
+  <section class="bg-navy-900 text-white py-4" style="background-color: #0f2244;">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-      <nav class="text-sm text-gray-400">
+      <nav class="text-sm text-gray-400 flex items-center gap-2 flex-wrap">
         <a href="/" class="hover:text-orange-400">Acasă</a>
-        <span class="mx-2">/</span>
+        <span>/</span>
         <a href="/parc-auto" class="hover:text-orange-400">Parc Auto</a>
-        <span class="mx-2">/</span>
+        <span>/</span>
         <span class="text-gray-200">{car.title}</span>
       </nav>
     </div>
   </section>
 
-  <section class="py-10 bg-gray-50">
+  <section class="py-8 bg-gray-50">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <div class="grid lg:grid-cols-3 gap-8">
-        <!-- Images + Description -->
+
+        <!-- LEFT: Images + Info -->
         <div class="lg:col-span-2 space-y-6">
-          <!-- Main image -->
+
+          <!-- Image gallery -->
           <div class="bg-white rounded-xl overflow-hidden shadow-md">
             {primaryImage ? (
               <img
+                id="main-image"
                 src={primaryImage.image_url}
                 alt={car.title}
-                class="w-full object-cover max-h-96"
+                class="w-full object-cover max-h-[480px] cursor-zoom-in"
                 loading="eager"
               />
             ) : (
@@ -67,91 +81,253 @@ const specs = [
             )}
           </div>
 
-          <!-- Thumbnails -->
           {images.length > 1 && (
             <div class="grid grid-cols-4 sm:grid-cols-6 gap-2">
-              {images.map(img => (
+              {images.map((img, i) => (
                 <img
                   src={img.image_url}
-                  alt={car.title}
-                  class="w-full aspect-square object-cover rounded-lg cursor-pointer hover:opacity-80 transition-opacity shadow-sm"
+                  alt={`${car.title} foto ${i + 1}`}
+                  class="w-full aspect-square object-cover rounded-lg cursor-pointer hover:opacity-80 transition-opacity shadow-sm border-2 border-transparent hover:border-orange-400"
                   loading="lazy"
+                  data-src={img.image_url}
+                  onclick="document.getElementById('main-image').src=this.dataset.src"
                 />
               ))}
             </div>
           )}
 
-          <!-- Description -->
-          <div class="bg-white rounded-xl shadow-md p-6">
-            <h2 class="text-xl font-bold text-navy-800 mb-4" style="color: #0f2244;">Descriere</h2>
-            <p class="text-gray-700 leading-relaxed whitespace-pre-wrap">{car.description || 'Contactați-ne pentru detalii suplimentare.'}</p>
+          <!-- Trust badges -->
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+            {[
+              { icon: '🛡️', label: 'Garanție 12 luni' },
+              { icon: '🔍', label: 'Verificat tehnic' },
+              { icon: '📋', label: 'Istoric complet' },
+              { icon: '💳', label: 'Finanțare rapidă' },
+            ].map(b => (
+              <div class="bg-white rounded-xl p-3 text-center shadow-sm border border-gray-100">
+                <div class="text-2xl mb-1">{b.icon}</div>
+                <div class="text-xs font-semibold text-gray-700">{b.label}</div>
+              </div>
+            ))}
           </div>
 
-          <!-- Features -->
+          <!-- Description -->
+          {car.description && (
+            <div class="bg-white rounded-xl shadow-md p-6">
+              <h2 class="text-xl font-bold mb-4" style="color: #0f2244;">Descriere</h2>
+              <p class="text-gray-700 leading-relaxed whitespace-pre-wrap">{car.description}</p>
+            </div>
+          )}
+
+          <!-- Features/Dotări -->
           {features.length > 0 && (
             <div class="bg-white rounded-xl shadow-md p-6">
-              <h2 class="text-xl font-bold text-navy-800 mb-4" style="color: #0f2244;">Dotări</h2>
+              <h2 class="text-xl font-bold mb-4" style="color: #0f2244;">Dotări</h2>
               <div class="grid grid-cols-2 sm:grid-cols-3 gap-2">
                 {features.map(f => (
                   <div class="flex items-center gap-2 text-sm text-gray-700">
-                    <span class="text-orange-500 font-bold">✓</span>
+                    <span class="text-green-500 font-bold">✓</span>
                     <span>{f}</span>
                   </div>
                 ))}
               </div>
             </div>
           )}
-        </div>
 
-        <!-- Sidebar -->
-        <div class="space-y-6">
-          <!-- Price card -->
-          <div class="bg-white rounded-xl shadow-md p-6 sticky top-20">
-            <h1 class="text-2xl font-bold text-gray-900 mb-1">{car.title}</h1>
-            <p class="text-gray-500 text-sm mb-4">{car.year} · {formattedMileage} km · {car.fuel_type}</p>
+          <!-- Calculator Finanțare -->
+          <div class="bg-white rounded-xl shadow-md p-6" id="calculator">
+            <h2 class="text-xl font-bold mb-2" style="color: #0f2244;">💳 Calculator Finanțare</h2>
+            <p class="text-sm text-gray-500 mb-6">Estimează rata lunară pentru această mașină</p>
 
-            <div class="text-4xl font-extrabold text-orange-500 mb-6">
-              {formattedPrice} <span class="text-2xl">€</span>
-            </div>
+            <div class="space-y-5">
+              <div>
+                <label class="form-label">Preț vehicul</label>
+                <div class="text-2xl font-bold text-orange-500">{formattedPrice} €</div>
+              </div>
 
-            <div class="space-y-3 mb-6">
-              <a href={`/test-drive?masina=${encodeURIComponent(car.title)}`} class="btn-primary w-full text-center block">
-                🏎️ Solicită Test Drive
-              </a>
-              <a href={`/cerere-finantare?masina=${encodeURIComponent(car.title)}`} class="btn-secondary w-full text-center block">
-                💳 Cerere Finanțare
-              </a>
-              <a href={`/programeaza-vizita?masina=${encodeURIComponent(car.title)}`} class="btn-outline w-full text-center block">
-                📅 Programează Vizită
-              </a>
-            </div>
+              <div>
+                <label class="form-label flex justify-between">
+                  <span>Avans</span>
+                  <span class="text-orange-500 font-semibold" id="avans-val">20%</span>
+                </label>
+                <input type="range" id="avans-range" min="10" max="70" value="20" step="5"
+                  class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-orange-500" />
+                <div class="flex justify-between text-xs text-gray-400 mt-1">
+                  <span>10%</span><span>70%</span>
+                </div>
+              </div>
 
-            <div class="border-t pt-4 space-y-2 text-sm">
-              <a href="tel:0721586534" class="flex items-center gap-2 text-gray-700 hover:text-orange-500 transition-colors">
-                <span>📞</span> <span>0721 586 534</span>
-              </a>
-              <a href="mailto:contact@dagauto.ro" class="flex items-center gap-2 text-gray-700 hover:text-orange-500 transition-colors">
-                <span>✉️</span> <span>contact@dagauto.ro</span>
+              <div>
+                <label class="form-label flex justify-between">
+                  <span>Perioadă</span>
+                  <span class="text-orange-500 font-semibold" id="period-val">48 luni</span>
+                </label>
+                <input type="range" id="period-range" min="12" max="84" value="48" step="12"
+                  class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-orange-500" />
+                <div class="flex justify-between text-xs text-gray-400 mt-1">
+                  <span>12 luni</span><span>84 luni</span>
+                </div>
+              </div>
+
+              <div class="bg-orange-50 border border-orange-200 rounded-xl p-5 text-center">
+                <div class="text-sm text-gray-600 mb-1">Rată lunară estimată</div>
+                <div class="text-4xl font-extrabold text-orange-500" id="rata-result">—</div>
+                <div class="text-xs text-gray-500 mt-2" id="calc-details"></div>
+              </div>
+
+              <div class="text-xs text-gray-400 bg-gray-50 rounded-lg p-3">
+                * Calculul este orientativ (dobândă 8,5% / an). Rata finală depinde de banca finanțatoare. Avans minim 10%.
+              </div>
+
+              <a href={`/cerere-finantare?masina=${encodeURIComponent(car.title)}`}
+                class="btn-primary w-full text-center block">
+                Solicită Finanțare Acum →
               </a>
             </div>
           </div>
 
-          <!-- Specs -->
+          <!-- Specs table -->
           <div class="bg-white rounded-xl shadow-md p-6">
-            <h2 class="text-lg font-bold text-navy-800 mb-4" style="color: #0f2244;">Specificații</h2>
-            <div class="space-y-3">
+            <h2 class="text-xl font-bold mb-4" style="color: #0f2244;">Specificații tehnice</h2>
+            <div class="grid grid-cols-2 gap-3">
               {specs.map(s => (
-                <div class="flex items-center justify-between text-sm border-b border-gray-50 pb-2">
-                  <span class="flex items-center gap-2 text-gray-500">
-                    <span>{s.icon}</span> {s.label}
-                  </span>
-                  <span class="font-semibold text-gray-800">{s.value}</span>
+                <div class="flex items-center gap-3 border border-gray-100 rounded-lg p-3">
+                  <span class="text-xl">{s.icon}</span>
+                  <div>
+                    <div class="text-xs text-gray-500">{s.label}</div>
+                    <div class="font-semibold text-gray-800 text-sm">{s.value}</div>
+                  </div>
                 </div>
               ))}
             </div>
           </div>
         </div>
+
+        <!-- RIGHT: Sidebar -->
+        <div class="space-y-6">
+          <div class="bg-white rounded-xl shadow-md p-6 sticky top-20">
+            <!-- Title + Price -->
+            <h1 class="text-xl font-bold text-gray-900 mb-1">{car.title}</h1>
+            <p class="text-gray-500 text-sm mb-4">{car.year} · {formattedMileage} km · {car.fuel_type}</p>
+
+            {hasDiscount && (
+              <div class="flex items-center gap-2 mb-1">
+                <span class="bg-red-100 text-red-600 text-xs font-bold px-2 py-1 rounded-full">-{discountPct}% REDUCERE</span>
+                <span class="text-gray-400 line-through text-sm">{new Intl.NumberFormat('ro-RO').format((car as any).old_price)} €</span>
+              </div>
+            )}
+            <div class="text-4xl font-extrabold text-orange-500 mb-2">
+              {formattedPrice} <span class="text-xl">€</span>
+            </div>
+            <div class="text-xs text-gray-400 mb-5">≈ {new Intl.NumberFormat('ro-RO').format(Math.round(car.price * 4.97))} lei · TVA inclus</div>
+
+            <!-- CTAs -->
+            <div class="space-y-2.5 mb-5">
+              <a href={`/test-drive?masina=${encodeURIComponent(car.title)}`}
+                class="btn-primary w-full text-center block">
+                🏎️ Solicită Test Drive
+              </a>
+              <a href="#calculator"
+                class="btn-secondary w-full text-center block">
+                💳 Calculează Rata
+              </a>
+              <a href={`/programeaza-vizita?masina=${encodeURIComponent(car.title)}`}
+                class="btn-outline w-full text-center block">
+                📅 Programează Vizită
+              </a>
+              <!-- WhatsApp -->
+              <a href={`https://wa.me/40721586534?text=${encodeURIComponent(`Bună ziua! Sunt interesat de ${car.title} (${car.year}, ${formattedPrice} €). Puteți să îmi dați mai multe detalii?`)}`}
+                target="_blank" rel="noopener"
+                class="flex items-center justify-center gap-2 w-full py-3 px-4 bg-green-500 hover:bg-green-600 text-white font-semibold rounded-lg transition-colors">
+                <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
+                </svg>
+                WhatsApp
+              </a>
+            </div>
+
+            <!-- Contact -->
+            <div class="border-t pt-4 space-y-2 text-sm">
+              <a href="tel:0721586534" class="flex items-center gap-2 text-gray-700 hover:text-orange-500 transition-colors">
+                <span>📞</span> <span class="font-medium">0721 586 534</span>
+              </a>
+              <a href="mailto:contact@dagauto.ro" class="flex items-center gap-2 text-gray-700 hover:text-orange-500 transition-colors">
+                <span>✉️</span> <span>contact@dagauto.ro</span>
+              </a>
+            </div>
+
+            <!-- Dealer trust -->
+            <div class="mt-4 pt-4 border-t">
+              <div class="flex items-center gap-2 mb-2">
+                <span class="text-2xl">🏆</span>
+                <div>
+                  <div class="font-bold text-sm text-gray-800">DAG Auto Buzău</div>
+                  <div class="text-xs text-gray-500">10+ ani experiență · 500+ mașini vândute</div>
+                </div>
+              </div>
+              <div class="flex gap-1 text-yellow-400">
+                {'★★★★★'.split('').map(s => <span>{s}</span>)}
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
+
+      <!-- Similar cars -->
+      {similarCars.length > 0 && (
+        <div class="mt-12">
+          <h2 class="text-2xl font-bold mb-6" style="color: #0f2244;">
+            Mașini similare {car.make}
+          </h2>
+          <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            {similarCars.map((c: any) => (
+              <CarCard
+                id={c.id}
+                title={c.title}
+                slug={c.slug}
+                make={c.make}
+                model={c.model}
+                year={c.year}
+                price={c.price}
+                old_price={c.old_price}
+                mileage={c.mileage}
+                fuel_type={c.fuel_type}
+                transmission={c.transmission}
+                featured={c.featured}
+                primary_image={c.primary_image}
+              />
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   </section>
 </Layout>
+
+<script define:vars={{ carPrice: car.price }}>
+  // Calculator finanțare
+  const avansRange = document.getElementById('avans-range');
+  const periodRange = document.getElementById('period-range');
+  const avansVal = document.getElementById('avans-val');
+  const periodVal = document.getElementById('period-val');
+  const rataResult = document.getElementById('rata-result');
+  const calcDetails = document.getElementById('calc-details');
+
+  function calcRata() {
+    const avans = Number(avansRange.value) / 100;
+    const months = Number(periodRange.value);
+    const principal = carPrice * (1 - avans);
+    const monthlyRate = 0.085 / 12;
+    const rata = principal * (monthlyRate * Math.pow(1 + monthlyRate, months)) / (Math.pow(1 + monthlyRate, months) - 1);
+    const avansEur = Math.round(carPrice * avans);
+
+    avansVal.textContent = `${avansRange.value}% (${new Intl.NumberFormat('ro-RO').format(avansEur)} €)`;
+    periodVal.textContent = `${months} luni`;
+    rataResult.textContent = `${new Intl.NumberFormat('ro-RO').format(Math.round(rata))} €/lună`;
+    calcDetails.textContent = `Avans: ${new Intl.NumberFormat('ro-RO').format(avansEur)} € · Finanțat: ${new Intl.NumberFormat('ro-RO').format(Math.round(principal))} € · ${months} luni`;
+  }
+
+  avansRange.addEventListener('input', calcRata);
+  periodRange.addEventListener('input', calcRata);
+  calcRata();
+</script>

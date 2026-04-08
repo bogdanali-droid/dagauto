@@ -26,6 +26,8 @@ CREATE TABLE IF NOT EXISTS cars (
   description TEXT DEFAULT '',
   features TEXT DEFAULT '',
   status TEXT NOT NULL DEFAULT 'available' CHECK(status IN ('available','sold','reserved')),
+  old_price INTEGER DEFAULT 0,
+  featured INTEGER NOT NULL DEFAULT 0,
   created_at TEXT NOT NULL DEFAULT (datetime('now')),
   updated_at TEXT NOT NULL DEFAULT (datetime('now'))
 );

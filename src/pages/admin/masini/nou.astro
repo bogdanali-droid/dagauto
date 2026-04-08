@@ -11,24 +11,23 @@ if (Astro.request.method === 'POST') {
     const title = data.get('title') as string;
     const slug = generateSlug(title) + '-' + Date.now().toString(36);
 
-    await createCar(DB, {
-      title,
-      slug,
-      make: data.get('make') as string,
-      model: data.get('model') as string,
-      year: Number(data.get('year')),
-      price: Number(data.get('price')),
-      mileage: Number(data.get('mileage')),
-      fuel_type: data.get('fuel_type') as string,
-      transmission: data.get('transmission') as string,
-      body_type: data.get('body_type') as string,
-      color: data.get('color') as string,
-      engine_size: data.get('engine_size') as string,
-      power: Number(data.get('power')),
-      description: data.get('description') as string,
-      features: data.get('features') as string,
-      status: (data.get('status') as 'available' | 'sold' | 'reserved') || 'available',
-    });
+    const oldPrice = Number(data.get('old_price')) || 0;
+    const featured = data.get('featured') === '1' ? 1 : 0;
+    await DB.prepare(`
+      INSERT INTO cars (title, slug, make, model, year, price, mileage, fuel_type, transmission, body_type, color, engine_size, power, description, features, status, old_price, featured)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    `).bind(
+      title, slug,
+      data.get('make'), data.get('model'),
+      Number(data.get('year')), Number(data.get('price')),
+      Number(data.get('mileage')), data.get('fuel_type'),
+      data.get('transmission'), data.get('body_type'),
+      data.get('color') || '', data.get('engine_size') || '',
+      Number(data.get('power')) || 0,
+      data.get('description') || '', data.get('features') || '',
+      data.get('status') || 'available',
+      oldPrice, featured
+    ).run();
 
     const newCar = await DB.prepare('SELECT id FROM cars ORDER BY id DESC LIMIT 1').first<{ id: number }>();
     return Astro.redirect(`/admin/masini/${newCar?.id}?saved=1`);
@@ -134,6 +133,20 @@ if (Astro.request.method === 'POST') {
         <div>
           <label class="form-label">Dotări (separate prin virgulă)</label>
           <textarea name="features" rows="3" class="form-input resize-none" placeholder="Navigație, Camere 360, Scaune încălzite, Panoramic..."></textarea>
+        </div>
+      </div>
+
+      <div class="bg-white rounded-xl shadow-sm p-6 space-y-4">
+        <h2 class="font-semibold text-gray-700 border-b pb-2">Preț și Promoție</h2>
+        <div class="grid sm:grid-cols-2 gap-4">
+          <div>
+            <label class="form-label">Preț vechi (€) <span class="text-gray-400 font-normal">— pentru badge Reducere</span></label>
+            <input type="number" name="old_price" class="form-input" min="0" placeholder="0 = fără reducere" />
+          </div>
+          <div class="flex items-center gap-3 mt-6">
+            <input type="checkbox" name="featured" id="featured" value="1" class="w-5 h-5 accent-orange-500" />
+            <label for="featured" class="form-label mb-0 cursor-pointer">⭐ Mașină Recomandată (afișată în top)</label>
+          </div>
         </div>
       </div>
 

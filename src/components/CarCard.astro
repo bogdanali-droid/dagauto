@@ -7,69 +7,139 @@ interface Props {
   model: string;
   year: number;
   price: number;
+  old_price?: number;
   mileage: number;
   fuel_type: string;
   transmission: string;
+  body_type?: string;
+  featured?: number;
   primary_image?: string;
 }
 
-const { title, slug, year, price, mileage, fuel_type, transmission, primary_image } = Astro.props;
+const { id, title, slug, year, price, old_price, mileage, fuel_type, transmission, featured, primary_image } = Astro.props;
 
 const formattedPrice = new Intl.NumberFormat('ro-RO').format(price);
 const formattedMileage = new Intl.NumberFormat('ro-RO').format(mileage);
+const hasDiscount = old_price && old_price > price;
+const discountPct = hasDiscount ? Math.round((1 - price / old_price!) * 100) : 0;
 ---
 
-<a href={`/parc-auto/${slug}`} class="group bg-white rounded-xl shadow-md hover:shadow-xl transition-all duration-300 overflow-hidden flex flex-col">
-  <!-- Image -->
-  <div class="relative overflow-hidden bg-gray-100 aspect-[4/3]">
-    {primary_image ? (
-      <img
-        src={primary_image}
-        alt={title}
-        class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-        loading="lazy"
-      />
-    ) : (
-      <div class="w-full h-full flex items-center justify-center text-gray-400">
-        <svg class="w-16 h-16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
-        </svg>
-      </div>
-    )}
-    <div class="absolute top-3 right-3 bg-orange-500 text-white text-sm font-bold px-3 py-1 rounded-full">
-      {formattedPrice} €
-    </div>
+<div class="group bg-white rounded-xl shadow-md hover:shadow-xl transition-all duration-300 overflow-hidden flex flex-col relative">
+  <!-- Badges overlay -->
+  <div class="absolute top-3 left-3 z-10 flex flex-col gap-1.5">
+    {featured ? (
+      <span class="bg-orange-500 text-white text-xs font-bold px-2 py-1 rounded-full shadow">⭐ Recomandat</span>
+    ) : null}
+    {hasDiscount ? (
+      <span class="bg-red-500 text-white text-xs font-bold px-2 py-1 rounded-full shadow">-{discountPct}%</span>
+    ) : null}
+    <span class="bg-green-600 text-white text-xs font-semibold px-2 py-1 rounded-full shadow">✓ Garantie 12 luni</span>
   </div>
 
-  <!-- Details -->
-  <div class="p-4 flex flex-col gap-3 flex-1">
-    <h3 class="font-bold text-gray-900 text-lg leading-tight group-hover:text-orange-600 transition-colors line-clamp-2">
-      {title}
-    </h3>
+  <!-- Favorite button -->
+  <button
+    class="favorite-btn absolute top-3 right-3 z-10 w-9 h-9 bg-white/90 hover:bg-white rounded-full shadow flex items-center justify-center transition-all"
+    data-id={id}
+    data-title={title}
+    aria-label="Salvează mașina"
+  >
+    <svg class="w-5 h-5 heart-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
+    </svg>
+  </button>
 
-    <div class="grid grid-cols-2 gap-2 text-sm text-gray-600">
-      <div class="flex items-center gap-1.5">
-        <span class="text-orange-400">📅</span>
-        <span>{year}</span>
-      </div>
-      <div class="flex items-center gap-1.5">
-        <span class="text-orange-400">🛣️</span>
-        <span>{formattedMileage} km</span>
-      </div>
-      <div class="flex items-center gap-1.5">
-        <span class="text-orange-400">⛽</span>
-        <span>{fuel_type}</span>
-      </div>
-      <div class="flex items-center gap-1.5">
-        <span class="text-orange-400">⚙️</span>
-        <span>{transmission}</span>
-      </div>
+  <a href={`/parc-auto/${slug}`} class="block">
+    <!-- Image -->
+    <div class="relative overflow-hidden bg-gray-100 aspect-[4/3]">
+      {primary_image ? (
+        <img
+          src={primary_image}
+          alt={title}
+          class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+          loading="lazy"
+        />
+      ) : (
+        <div class="w-full h-full flex items-center justify-center text-gray-400">
+          <svg class="w-16 h-16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+          </svg>
+        </div>
+      )}
     </div>
 
-    <div class="mt-auto pt-3 border-t border-gray-100">
-      <span class="text-orange-500 font-semibold text-sm group-hover:underline">
-        Vezi detalii →
-      </span>
+    <!-- Details -->
+    <div class="p-4 flex flex-col gap-3 flex-1">
+      <h3 class="font-bold text-gray-900 text-lg leading-tight group-hover:text-orange-600 transition-colors line-clamp-2">
+        {title}
+      </h3>
+
+      <div class="grid grid-cols-2 gap-2 text-sm text-gray-600">
+        <div class="flex items-center gap-1.5">
+          <span class="text-orange-400">📅</span>
+          <span>{year}</span>
+        </div>
+        <div class="flex items-center gap-1.5">
+          <span class="text-orange-400">🛣️</span>
+          <span>{formattedMileage} km</span>
+        </div>
+        <div class="flex items-center gap-1.5">
+          <span class="text-orange-400">⛽</span>
+          <span>{fuel_type}</span>
+        </div>
+        <div class="flex items-center gap-1.5">
+          <span class="text-orange-400">⚙️</span>
+          <span>{transmission}</span>
+        </div>
+      </div>
+
+      <div class="mt-auto pt-3 border-t border-gray-100 flex items-end justify-between">
+        <div>
+          {hasDiscount ? (
+            <div class="text-sm text-gray-400 line-through">{new Intl.NumberFormat('ro-RO').format(old_price!)} €</div>
+          ) : null}
+          <div class="text-xl font-extrabold text-orange-500">{formattedPrice} €</div>
+        </div>
+        <span class="text-orange-500 font-semibold text-sm group-hover:underline">
+          Vezi →
+        </span>
+      </div>
     </div>
-  </div>
-</a>
+  </a>
+</div>
+
+<script>
+  // Favorites logic
+  function getFavorites(): number[] {
+    try { return JSON.parse(localStorage.getItem('dagauto_favorites') || '[]'); } catch { return []; }
+  }
+  function saveFavorites(ids: number[]) {
+    localStorage.setItem('dagauto_favorites', JSON.stringify(ids));
+    window.dispatchEvent(new Event('favorites-changed'));
+  }
+
+  document.querySelectorAll('.favorite-btn').forEach(btn => {
+    const id = Number((btn as HTMLElement).dataset.id);
+    const icon = btn.querySelector('.heart-icon') as SVGElement;
+    const favs = getFavorites();
+    if (favs.includes(id)) {
+      icon.setAttribute('fill', '#f97316');
+      icon.setAttribute('stroke', '#f97316');
+    }
+    btn.addEventListener('click', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      const current = getFavorites();
+      const idx = current.indexOf(id);
+      if (idx === -1) {
+        current.push(id);
+        icon.setAttribute('fill', '#f97316');
+        icon.setAttribute('stroke', '#f97316');
+      } else {
+        current.splice(idx, 1);
+        icon.setAttribute('fill', 'none');
+        icon.setAttribute('stroke', 'currentColor');
+      }
+      saveFavorites(current);
+    });
+  });
+</script>

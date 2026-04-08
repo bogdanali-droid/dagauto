@@ -1,7 +1,7 @@
 ---
 import '../../styles/global.css';
-import { getUserByUsername, hashPassword } from '../../lib/db';
-import { createSessionToken, setSessionCookie, getSessionToken, verifySessionToken } from '../../lib/auth';
+import { getUserByUsername } from '../../lib/db';
+import { hashPassword, createSessionToken, setSessionCookie, getSessionToken, verifySessionToken } from '../../lib/auth';
 
 const { DB, SESSION_SECRET } = Astro.locals.runtime.env;
 const secret = SESSION_SECRET || 'dev-secret-change-in-prod';

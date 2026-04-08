@@ -1,0 +1,12 @@
+name = "dagauto"
+main = "src/index.js"
+compatibility_date = "2024-01-01"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "dagauto"
+database_id = "d9668a9a-a6f5-4232-86f2-ab0a96bc5a9f"
+
+[[r2_buckets]]
+binding = "IMAGES"
+bucket_name = "dagauto-images"

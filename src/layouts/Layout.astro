@@ -1,0 +1,75 @@
+---
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import '../styles/global.css';
+
+interface Props {
+  title: string;
+  description?: string;
+  image?: string;
+  canonicalUrl?: string;
+}
+
+const {
+  title,
+  description = 'DAG Auto - Mașini second hand de calitate în Buzău. Parc auto cu sute de mașini verificate, finanțare rapidă și garanție.',
+  image = '/og-image.jpg',
+  canonicalUrl
+} = Astro.props;
+
+const siteUrl = 'https://dagauto.ro';
+const fullTitle = title.includes('DAG Auto') ? title : `${title} | DAG Auto Buzău`;
+---
+
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>{fullTitle}</title>
+  <meta name="description" content={description} />
+  <link rel="canonical" href={canonicalUrl || `${siteUrl}${Astro.url.pathname}`} />
+
+  <!-- Open Graph -->
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content={fullTitle} />
+  <meta property="og:description" content={description} />
+  <meta property="og:image" content={`${siteUrl}${image}`} />
+  <meta property="og:url" content={canonicalUrl || `${siteUrl}${Astro.url.pathname}`} />
+  <meta property="og:site_name" content="DAG Auto Buzău" />
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+
+  <!-- Preconnect -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+
+  <!-- Schema.org -->
+  <script type="application/ld+json">
+    {JSON.stringify({
+      "@context": "https://schema.org",
+      "@type": "AutoDealer",
+      "name": "DAG Auto",
+      "url": siteUrl,
+      "telephone": "0721586534",
+      "email": "contact@dagauto.ro",
+      "address": {
+        "@type": "PostalAddress",
+        "streetAddress": "Calea E85 nr.37",
+        "addressLocality": "Com. Mărăcineni",
+        "addressRegion": "Buzău",
+        "addressCountry": "RO"
+      }
+    })}
+  </script>
+</head>
+<body class="bg-white text-gray-900" style="font-family: 'Inter', system-ui, sans-serif;">
+  <Header />
+  <main>
+    <slot />
+  </main>
+  <Footer />
+</body>
+</html>

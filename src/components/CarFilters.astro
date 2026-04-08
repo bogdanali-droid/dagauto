@@ -1,0 +1,92 @@
+---
+interface Props {
+  makes: string[];
+  currentFilters: {
+    make?: string;
+    fuel_type?: string;
+    transmission?: string;
+    body_type?: string;
+    min_price?: string;
+    max_price?: string;
+    min_year?: string;
+    max_year?: string;
+  };
+}
+
+const { makes, currentFilters } = Astro.props;
+
+const fuelTypes = ['Benzină', 'Diesel', 'Hibrid', 'Electric', 'GPL'];
+const transmissions = ['Manuală', 'Automată'];
+const bodyTypes = ['Berlină', 'Break', 'SUV', 'Hatchback', 'Coupe', 'Cabrio', 'Monovolum', 'Pickup'];
+---
+
+<form method="GET" action="/parc-auto" class="bg-white rounded-xl shadow-md p-6">
+  <h2 class="text-lg font-bold text-navy-800 mb-5" style="color: #0f2244;">Filtrează Mașini</h2>
+
+  <div class="space-y-4">
+    <!-- Make -->
+    <div>
+      <label class="form-label">Marcă</label>
+      <select name="make" class="form-select">
+        <option value="">Toate mărcile</option>
+        {makes.map(make => (
+          <option value={make} selected={currentFilters.make === make}>{make}</option>
+        ))}
+      </select>
+    </div>
+
+    <!-- Fuel type -->
+    <div>
+      <label class="form-label">Combustibil</label>
+      <select name="fuel_type" class="form-select">
+        <option value="">Toate</option>
+        {fuelTypes.map(f => (
+          <option value={f} selected={currentFilters.fuel_type === f}>{f}</option>
+        ))}
+      </select>
+    </div>
+
+    <!-- Transmission -->
+    <div>
+      <label class="form-label">Transmisie</label>
+      <select name="transmission" class="form-select">
+        <option value="">Toate</option>
+        {transmissions.map(t => (
+          <option value={t} selected={currentFilters.transmission === t}>{t}</option>
+        ))}
+      </select>
+    </div>
+
+    <!-- Body type -->
+    <div>
+      <label class="form-label">Caroserie</label>
+      <select name="body_type" class="form-select">
+        <option value="">Toate</option>
+        {bodyTypes.map(b => (
+          <option value={b} selected={currentFilters.body_type === b}>{b}</option>
+        ))}
+      </select>
+    </div>
+
+    <!-- Price range -->
+    <div>
+      <label class="form-label">Preț (€)</label>
+      <div class="flex gap-2">
+        <input type="number" name="min_price" placeholder="Min" value={currentFilters.min_price} class="form-input" min="0" step="500" />
+        <input type="number" name="max_price" placeholder="Max" value={currentFilters.max_price} class="form-input" min="0" step="500" />
+      </div>
+    </div>
+
+    <!-- Year range -->
+    <div>
+      <label class="form-label">An fabricație</label>
+      <div class="flex gap-2">
+        <input type="number" name="min_year" placeholder="De la" value={currentFilters.min_year} class="form-input" min="2000" max="2024" />
+        <input type="number" name="max_year" placeholder="Până la" value={currentFilters.max_year} class="form-input" min="2000" max="2024" />
+      </div>
+    </div>
+
+    <button type="submit" class="btn-primary w-full">Aplică Filtre</button>
+    <a href="/parc-auto" class="btn-outline w-full text-center block">Resetează</a>
+  </div>
+</form>

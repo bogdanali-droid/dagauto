@@ -1,0 +1,125 @@
+---
+import AdminLayout from '../../layouts/AdminLayout.astro';
+import { getCars, getBlogPosts, getFormSubmissions } from '../../lib/db';
+
+const { DB } = Astro.locals.runtime.env;
+
+const [carsRes, postsRes, submissionsRes] = await Promise.all([
+  DB.prepare('SELECT COUNT(*) as total FROM cars').first<{ total: number }>(),
+  DB.prepare('SELECT COUNT(*) as total FROM blog_posts WHERE status = \'published\'').first<{ total: number }>(),
+  DB.prepare('SELECT COUNT(*) as total FROM form_submissions WHERE read_at IS NULL').first<{ total: number }>(),
+]);
+
+const stats = [
+  { label: 'Mașini disponibile', value: carsRes?.total ?? 0, icon: '🚗', href: '/admin/masini' },
+  { label: 'Articole blog', value: postsRes?.total ?? 0, icon: '📝', href: '/admin/blog' },
+  { label: 'Formulare necitite', value: submissionsRes?.total ?? 0, icon: '📬', href: '/admin/submissions' },
+];
+
+const { results: recentCars } = await getCars(DB, { limit: 5, status: undefined });
+const { results: recentSubmissions } = await getFormSubmissions(DB, undefined, 5);
+---
+
+<AdminLayout title="Dashboard">
+  <div class="space-y-8">
+    <!-- Stats -->
+    <div class="grid grid-cols-1 sm:grid-cols-3 gap-6">
+      {stats.map(s => (
+        <a href={s.href} class="bg-white rounded-xl shadow-sm p-6 flex items-center gap-4 hover:shadow-md transition-shadow">
+          <span class="text-4xl">{s.icon}</span>
+          <div>
+            <div class="text-3xl font-bold text-gray-800">{s.value}</div>
+            <div class="text-sm text-gray-500">{s.label}</div>
+          </div>
+        </a>
+      ))}
+    </div>
+
+    <!-- Quick actions -->
+    <div class="bg-white rounded-xl shadow-sm p-6">
+      <h2 class="font-semibold text-gray-700 mb-4">Acțiuni Rapide</h2>
+      <div class="flex flex-wrap gap-3">
+        <a href="/admin/masini/nou" class="btn-primary text-sm">+ Adaugă Mașină</a>
+        <a href="/admin/blog/nou" class="btn-secondary text-sm">+ Articol Blog</a>
+        <a href="/admin/submissions" class="btn-outline text-sm">📬 Vezi Formulare</a>
+      </div>
+    </div>
+
+    <!-- Recent cars -->
+    <div class="bg-white rounded-xl shadow-sm overflow-hidden">
+      <div class="p-6 flex items-center justify-between border-b">
+        <h2 class="font-semibold text-gray-700">Ultimele Mașini</h2>
+        <a href="/admin/masini" class="text-sm text-orange-500 hover:underline">Vezi toate →</a>
+      </div>
+      <div class="overflow-x-auto">
+        <table class="w-full text-sm">
+          <thead class="bg-gray-50 text-gray-500 uppercase text-xs">
+            <tr>
+              <th class="px-6 py-3 text-left">Titlu</th>
+              <th class="px-6 py-3 text-left">Preț</th>
+              <th class="px-6 py-3 text-left">Status</th>
+              <th class="px-6 py-3 text-left">Acțiuni</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-gray-100">
+            {recentCars.map(car => (
+              <tr class="hover:bg-gray-50">
+                <td class="px-6 py-4 font-medium text-gray-800">{car.title}</td>
+                <td class="px-6 py-4 text-gray-600">{new Intl.NumberFormat('ro-RO').format(car.price)} €</td>
+                <td class="px-6 py-4">
+                  <span class={`px-2 py-1 rounded-full text-xs font-medium ${
+                    car.status === 'available' ? 'bg-green-100 text-green-700' :
+                    car.status === 'sold' ? 'bg-red-100 text-red-700' :
+                    'bg-yellow-100 text-yellow-700'
+                  }`}>{car.status}</span>
+                </td>
+                <td class="px-6 py-4">
+                  <a href={`/admin/masini/${car.id}`} class="text-orange-500 hover:underline mr-3">Editează</a>
+                  <a href={`/parc-auto/${car.slug}`} target="_blank" class="text-gray-400 hover:text-gray-600">↗</a>
+                </td>
+              </tr>
+            ))}
+            {recentCars.length === 0 && (
+              <tr><td colspan="4" class="px-6 py-8 text-center text-gray-400">Nicio mașină adăugată încă.</td></tr>
+            )}
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Recent submissions -->
+    <div class="bg-white rounded-xl shadow-sm overflow-hidden">
+      <div class="p-6 flex items-center justify-between border-b">
+        <h2 class="font-semibold text-gray-700">Ultimele Formulare</h2>
+        <a href="/admin/submissions" class="text-sm text-orange-500 hover:underline">Vezi toate →</a>
+      </div>
+      <div class="overflow-x-auto">
+        <table class="w-full text-sm">
+          <thead class="bg-gray-50 text-gray-500 uppercase text-xs">
+            <tr>
+              <th class="px-6 py-3 text-left">Tip</th>
+              <th class="px-6 py-3 text-left">Data</th>
+              <th class="px-6 py-3 text-left">Status</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-gray-100">
+            {recentSubmissions.map(sub => (
+              <tr class="hover:bg-gray-50">
+                <td class="px-6 py-4 font-medium text-gray-800">{sub.form_type}</td>
+                <td class="px-6 py-4 text-gray-600">{new Date(sub.created_at).toLocaleDateString('ro-RO')}</td>
+                <td class="px-6 py-4">
+                  <span class={`px-2 py-1 rounded-full text-xs ${sub.read_at ? 'bg-gray-100 text-gray-500' : 'bg-orange-100 text-orange-700 font-medium'}`}>
+                    {sub.read_at ? 'Citit' : 'Nou'}
+                  </span>
+                </td>
+              </tr>
+            ))}
+            {recentSubmissions.length === 0 && (
+              <tr><td colspan="3" class="px-6 py-8 text-center text-gray-400">Niciun formular primit.</td></tr>
+            )}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</AdminLayout>

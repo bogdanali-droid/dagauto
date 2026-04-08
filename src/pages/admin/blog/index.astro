@@ -1,0 +1,63 @@
+---
+import AdminLayout from '../../../layouts/AdminLayout.astro';
+import { getBlogPosts } from '../../../lib/db';
+
+const { DB } = Astro.locals.runtime.env;
+const { results: posts } = await getBlogPosts(DB, undefined, 100);
+// @ts-ignore - pass undefined to get all statuses
+const { results: allPosts } = await DB.prepare('SELECT * FROM blog_posts ORDER BY created_at DESC LIMIT 100').all();
+
+const deleted = Astro.url.searchParams.get('deleted');
+const saved = Astro.url.searchParams.get('saved');
+---
+
+<AdminLayout title="Blog">
+  <div class="space-y-6">
+    <div class="flex items-center justify-between">
+      <div>
+        {deleted && <p class="text-sm text-green-600">✅ Articolul a fost șters.</p>}
+        {saved && <p class="text-sm text-green-600">✅ Articolul a fost salvat.</p>}
+      </div>
+      <a href="/admin/blog/nou" class="btn-primary">+ Articol Nou</a>
+    </div>
+
+    <div class="bg-white rounded-xl shadow-sm overflow-hidden">
+      <div class="overflow-x-auto">
+        <table class="w-full text-sm">
+          <thead class="bg-gray-50 text-gray-500 uppercase text-xs">
+            <tr>
+              <th class="px-6 py-3 text-left">Titlu</th>
+              <th class="px-6 py-3 text-left">Status</th>
+              <th class="px-6 py-3 text-left">Data</th>
+              <th class="px-6 py-3 text-left">Acțiuni</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-gray-100">
+            {(allPosts as any[]).map((post: any) => (
+              <tr class="hover:bg-gray-50">
+                <td class="px-6 py-4 font-medium text-gray-800 max-w-sm truncate">{post.title}</td>
+                <td class="px-6 py-4">
+                  <span class={`px-2 py-1 rounded-full text-xs font-medium ${
+                    post.status === 'published' ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-600'
+                  }`}>{post.status === 'published' ? 'Publicat' : 'Draft'}</span>
+                </td>
+                <td class="px-6 py-4 text-gray-600">{new Date(post.created_at).toLocaleDateString('ro-RO')}</td>
+                <td class="px-6 py-4 flex items-center gap-3">
+                  <a href={`/admin/blog/${post.id}`} class="text-orange-500 hover:underline">Editează</a>
+                  {post.status === 'published' && (
+                    <a href={`/blog/${post.slug}`} target="_blank" class="text-gray-400 hover:text-gray-600 text-xs">↗ Site</a>
+                  )}
+                </td>
+              </tr>
+            ))}
+            {(allPosts as any[]).length === 0 && (
+              <tr><td colspan="4" class="px-6 py-12 text-center text-gray-400">
+                Niciun articol adăugat. <a href="/admin/blog/nou" class="text-orange-500 underline">Scrie primul articol →</a>
+              </td></tr>
+            )}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</AdminLayout>

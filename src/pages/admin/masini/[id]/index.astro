@@ -1,0 +1,233 @@
+---
+import AdminLayout from '../../../../layouts/AdminLayout.astro';
+import { getCarById, getCarImages, updateCar } from '../../../../lib/db';
+
+const { DB } = Astro.locals.runtime.env;
+const id = Number(Astro.params.id);
+
+const car = await getCarById(DB, id);
+if (!car) return Astro.redirect('/admin/masini');
+
+const { results: images } = await getCarImages(DB, id);
+let error = '';
+let saved = Astro.url.searchParams.get('saved') === '1';
+
+if (Astro.request.method === 'POST') {
+  try {
+    const data = await Astro.request.formData();
+    await updateCar(DB, id, {
+      title: data.get('title') as string,
+      make: data.get('make') as string,
+      model: data.get('model') as string,
+      year: Number(data.get('year')),
+      price: Number(data.get('price')),
+      mileage: Number(data.get('mileage')),
+      fuel_type: data.get('fuel_type') as string,
+      transmission: data.get('transmission') as string,
+      body_type: data.get('body_type') as string,
+      color: data.get('color') as string,
+      engine_size: data.get('engine_size') as string,
+      power: Number(data.get('power')),
+      description: data.get('description') as string,
+      features: data.get('features') as string,
+      status: data.get('status') as 'available' | 'sold' | 'reserved',
+    });
+    return Astro.redirect(`/admin/masini/${id}?saved=1`);
+  } catch (e) {
+    error = 'Eroare la salvare.';
+  }
+}
+---
+
+<AdminLayout title={`Editează: ${car.title}`}>
+  <div class="max-w-4xl space-y-6">
+    {saved && <div class="bg-green-50 border border-green-200 text-green-700 rounded-lg p-4">✅ Mașina a fost salvată!</div>}
+    {error && <div class="bg-red-50 border border-red-200 text-red-700 rounded-lg p-4">{error}</div>}
+
+    <!-- Images section -->
+    <div class="bg-white rounded-xl shadow-sm p-6">
+      <h2 class="font-semibold text-gray-700 border-b pb-2 mb-4">Imagini ({images.length})</h2>
+      <div class="grid grid-cols-3 sm:grid-cols-5 gap-3 mb-4">
+        {images.map(img => (
+          <div class="relative group">
+            <img src={img.image_url} alt="" class="w-full aspect-square object-cover rounded-lg" />
+            {img.is_primary === 1 && (
+              <span class="absolute top-1 left-1 bg-orange-500 text-white text-xs px-1.5 py-0.5 rounded">Principal</span>
+            )}
+            <button
+              type="button"
+              onclick={`deleteImage(${img.id})`}
+              class="absolute top-1 right-1 bg-red-500 text-white rounded-full w-6 h-6 text-xs hidden group-hover:flex items-center justify-center"
+            >✕</button>
+          </div>
+        ))}
+        {images.length === 0 && (
+          <div class="col-span-5 text-sm text-gray-400 py-4 text-center">Nicio imagine adăugată.</div>
+        )}
+      </div>
+
+      <!-- Upload form -->
+      <form id="upload-form" class="flex items-center gap-3">
+        <input type="file" id="image-file" name="file" accept="image/*" multiple class="form-input text-sm" />
+        <label class="flex items-center gap-1 text-sm text-gray-600">
+          <input type="checkbox" id="is-primary" class="mr-1" />
+          Principală
+        </label>
+        <button type="button" onclick="uploadImages()" class="btn-secondary text-sm py-2">
+          Încarcă
+        </button>
+      </form>
+      <p id="upload-status" class="text-sm mt-2"></p>
+    </div>
+
+    <!-- Edit form -->
+    <form method="POST" class="space-y-6">
+      <div class="bg-white rounded-xl shadow-sm p-6 space-y-4">
+        <h2 class="font-semibold text-gray-700 border-b pb-2">Informații Generale</h2>
+        <div>
+          <label class="form-label">Titlu anunț *</label>
+          <input type="text" name="title" required class="form-input" value={car.title} />
+        </div>
+        <div class="grid sm:grid-cols-2 gap-4">
+          <div>
+            <label class="form-label">Marcă *</label>
+            <input type="text" name="make" required class="form-input" value={car.make} />
+          </div>
+          <div>
+            <label class="form-label">Model *</label>
+            <input type="text" name="model" required class="form-input" value={car.model} />
+          </div>
+        </div>
+        <div class="grid sm:grid-cols-3 gap-4">
+          <div>
+            <label class="form-label">An *</label>
+            <input type="number" name="year" required class="form-input" value={car.year} />
+          </div>
+          <div>
+            <label class="form-label">Preț (€) *</label>
+            <input type="number" name="price" required class="form-input" value={car.price} />
+          </div>
+          <div>
+            <label class="form-label">Kilometraj *</label>
+            <input type="number" name="mileage" required class="form-input" value={car.mileage} />
+          </div>
+        </div>
+      </div>
+
+      <div class="bg-white rounded-xl shadow-sm p-6 space-y-4">
+        <h2 class="font-semibold text-gray-700 border-b pb-2">Specificații</h2>
+        <div class="grid sm:grid-cols-2 gap-4">
+          <div>
+            <label class="form-label">Combustibil</label>
+            <select name="fuel_type" class="form-select">
+              {['Benzină','Diesel','Hibrid','Electric','GPL'].map(f => (
+                <option selected={car.fuel_type === f}>{f}</option>
+              ))}
+            </select>
+          </div>
+          <div>
+            <label class="form-label">Transmisie</label>
+            <select name="transmission" class="form-select">
+              {['Manuală','Automată'].map(t => (
+                <option selected={car.transmission === t}>{t}</option>
+              ))}
+            </select>
+          </div>
+          <div>
+            <label class="form-label">Caroserie</label>
+            <select name="body_type" class="form-select">
+              {['Berlină','Break','SUV','Hatchback','Coupe','Cabrio','Monovolum','Pickup'].map(b => (
+                <option selected={car.body_type === b}>{b}</option>
+              ))}
+            </select>
+          </div>
+          <div>
+            <label class="form-label">Culoare</label>
+            <input type="text" name="color" class="form-input" value={car.color} />
+          </div>
+          <div>
+            <label class="form-label">Motor</label>
+            <input type="text" name="engine_size" class="form-input" value={car.engine_size} />
+          </div>
+          <div>
+            <label class="form-label">Putere (CP)</label>
+            <input type="number" name="power" class="form-input" value={car.power} />
+          </div>
+        </div>
+      </div>
+
+      <div class="bg-white rounded-xl shadow-sm p-6 space-y-4">
+        <h2 class="font-semibold text-gray-700 border-b pb-2">Descriere și Dotări</h2>
+        <div>
+          <label class="form-label">Descriere</label>
+          <textarea name="description" rows="5" class="form-input resize-none">{car.description}</textarea>
+        </div>
+        <div>
+          <label class="form-label">Dotări (separate prin virgulă)</label>
+          <textarea name="features" rows="3" class="form-input resize-none">{car.features}</textarea>
+        </div>
+      </div>
+
+      <div class="bg-white rounded-xl shadow-sm p-6">
+        <h2 class="font-semibold text-gray-700 border-b pb-2 mb-4">Status</h2>
+        <select name="status" class="form-select max-w-xs">
+          {(['available','reserved','sold'] as const).map(s => (
+            <option value={s} selected={car.status === s}>
+              {s === 'available' ? 'Disponibil' : s === 'reserved' ? 'Rezervat' : 'Vândut'}
+            </option>
+          ))}
+        </select>
+      </div>
+
+      <div class="flex gap-4">
+        <button type="submit" class="btn-primary">Salvează Modificările →</button>
+        <a href="/admin/masini" class="btn-outline">Înapoi</a>
+        <form method="POST" action={`/admin/masini/${id}/delete`} class="ml-auto"
+              onsubmit="return confirm('Ești sigur că vrei să ștergi această mașină?')">
+          <button type="submit" class="text-red-500 hover:text-red-700 text-sm underline">
+            Șterge mașina
+          </button>
+        </form>
+      </div>
+    </form>
+  </div>
+</AdminLayout>
+
+<script define:vars={{ carId: id }}>
+async function uploadImages() {
+  const fileInput = document.getElementById('image-file');
+  const isPrimary = document.getElementById('is-primary').checked;
+  const status = document.getElementById('upload-status');
+  const files = fileInput.files;
+  if (!files || files.length === 0) {
+    status.textContent = 'Selectează cel puțin o imagine.';
+    return;
+  }
+  status.textContent = 'Se încarcă...';
+  for (let i = 0; i < files.length; i++) {
+    const fd = new FormData();
+    fd.append('file', files[i]);
+    fd.append('car_id', String(carId));
+    fd.append('is_primary', String(i === 0 && isPrimary));
+    fd.append('sort_order', String(i));
+    const res = await fetch('/api/upload-image', { method: 'POST', body: fd });
+    if (!res.ok) {
+      status.textContent = 'Eroare la încărcare.';
+      return;
+    }
+  }
+  status.textContent = 'Imagini încărcate cu succes!';
+  setTimeout(() => location.reload(), 1000);
+}
+
+async function deleteImage(imageId) {
+  if (!confirm('Ștergi imaginea?')) return;
+  const res = await fetch('/api/delete-image', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ image_id: imageId }),
+  });
+  if (res.ok) location.reload();
+  else alert('Eroare la ștergere.');
+}
+</script>

@@ -1,0 +1,75 @@
+---
+interface Props {
+  id: number;
+  title: string;
+  slug: string;
+  make: string;
+  model: string;
+  year: number;
+  price: number;
+  mileage: number;
+  fuel_type: string;
+  transmission: string;
+  primary_image?: string;
+}
+
+const { title, slug, year, price, mileage, fuel_type, transmission, primary_image } = Astro.props;
+
+const formattedPrice = new Intl.NumberFormat('ro-RO').format(price);
+const formattedMileage = new Intl.NumberFormat('ro-RO').format(mileage);
+---
+
+<a href={`/parc-auto/${slug}`} class="group bg-white rounded-xl shadow-md hover:shadow-xl transition-all duration-300 overflow-hidden flex flex-col">
+  <!-- Image -->
+  <div class="relative overflow-hidden bg-gray-100 aspect-[4/3]">
+    {primary_image ? (
+      <img
+        src={primary_image}
+        alt={title}
+        class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+        loading="lazy"
+      />
+    ) : (
+      <div class="w-full h-full flex items-center justify-center text-gray-400">
+        <svg class="w-16 h-16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+        </svg>
+      </div>
+    )}
+    <div class="absolute top-3 right-3 bg-orange-500 text-white text-sm font-bold px-3 py-1 rounded-full">
+      {formattedPrice} €
+    </div>
+  </div>
+
+  <!-- Details -->
+  <div class="p-4 flex flex-col gap-3 flex-1">
+    <h3 class="font-bold text-gray-900 text-lg leading-tight group-hover:text-orange-600 transition-colors line-clamp-2">
+      {title}
+    </h3>
+
+    <div class="grid grid-cols-2 gap-2 text-sm text-gray-600">
+      <div class="flex items-center gap-1.5">
+        <span class="text-orange-400">📅</span>
+        <span>{year}</span>
+      </div>
+      <div class="flex items-center gap-1.5">
+        <span class="text-orange-400">🛣️</span>
+        <span>{formattedMileage} km</span>
+      </div>
+      <div class="flex items-center gap-1.5">
+        <span class="text-orange-400">⛽</span>
+        <span>{fuel_type}</span>
+      </div>
+      <div class="flex items-center gap-1.5">
+        <span class="text-orange-400">⚙️</span>
+        <span>{transmission}</span>
+      </div>
+    </div>
+
+    <div class="mt-auto pt-3 border-t border-gray-100">
+      <span class="text-orange-500 font-semibold text-sm group-hover:underline">
+        Vezi detalii →
+      </span>
+    </div>
+  </div>
+</a>

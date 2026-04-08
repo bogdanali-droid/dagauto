@@ -1,0 +1,73 @@
+---
+import AdminLayout from '../../../../layouts/AdminLayout.astro';
+import { getBlogPostById, updateBlogPost } from '../../../../lib/db';
+
+const { DB } = Astro.locals.runtime.env;
+const id = Number(Astro.params.id);
+
+const post = await getBlogPostById(DB, id);
+if (!post) return Astro.redirect('/admin/blog');
+
+let error = '';
+const saved = Astro.url.searchParams.get('saved') === '1';
+
+if (Astro.request.method === 'POST') {
+  try {
+    const data = await Astro.request.formData();
+    await updateBlogPost(DB, id, {
+      title: data.get('title') as string,
+      content: data.get('content') as string,
+      excerpt: data.get('excerpt') as string,
+      image_url: data.get('image_url') as string,
+      status: data.get('status') as 'published' | 'draft',
+    });
+    return Astro.redirect(`/admin/blog/${id}?saved=1`);
+  } catch (e) {
+    error = 'Eroare la salvare.';
+  }
+}
+---
+
+<AdminLayout title={`Editează: ${post.title}`}>
+  <div class="max-w-3xl">
+    {saved && <div class="bg-green-50 border border-green-200 text-green-700 rounded-lg p-4 mb-6">✅ Articolul a fost salvat!</div>}
+    {error && <div class="bg-red-50 border border-red-200 text-red-700 rounded-lg p-4 mb-6">{error}</div>}
+
+    <form method="POST" class="space-y-6">
+      <div class="bg-white rounded-xl shadow-sm p-6 space-y-4">
+        <div>
+          <label class="form-label">Titlu *</label>
+          <input type="text" name="title" required class="form-input" value={post.title} />
+        </div>
+        <div>
+          <label class="form-label">Rezumat</label>
+          <textarea name="excerpt" rows="2" class="form-input resize-none">{post.excerpt}</textarea>
+        </div>
+        <div>
+          <label class="form-label">URL Imagine</label>
+          <input type="text" name="image_url" class="form-input" value={post.image_url} />
+        </div>
+        <div>
+          <label class="form-label">Conținut *</label>
+          <textarea name="content" rows="15" required class="form-input resize-none font-mono text-sm">{post.content}</textarea>
+        </div>
+        <div>
+          <label class="form-label">Status</label>
+          <select name="status" class="form-select max-w-xs">
+            <option value="draft" selected={post.status === 'draft'}>Draft</option>
+            <option value="published" selected={post.status === 'published'}>Publicat</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="flex gap-4">
+        <button type="submit" class="btn-primary">Salvează →</button>
+        <a href="/admin/blog" class="btn-outline">Înapoi</a>
+        <form method="POST" action={`/admin/blog/${id}/delete`} class="ml-auto"
+              onsubmit="return confirm('Ștergi articolul?')">
+          <button type="submit" class="text-red-500 hover:text-red-700 text-sm underline">Șterge</button>
+        </form>
+      </div>
+    </form>
+  </div>
+</AdminLayout>

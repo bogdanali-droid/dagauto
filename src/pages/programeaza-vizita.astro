@@ -1,0 +1,88 @@
+---
+import Layout from '../layouts/Layout.astro';
+
+const success = Astro.url.searchParams.get('success');
+const masina = Astro.url.searchParams.get('masina') || '';
+---
+
+<Layout
+  title="Programează Vizită - DAG Auto Buzău"
+  description="Programează o vizită la DAG Auto Buzău. Vino la o oră convenabilă să inspectezi mașinile din parcul nostru."
+>
+  <section class="bg-navy-900 text-white py-10" style="background-color: #0f2244;">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <h1 class="text-3xl md:text-4xl font-extrabold mb-2">📅 Programează Vizită</h1>
+      <p class="text-gray-300">Vino fără așteptare, la ora ta convenabilă</p>
+    </div>
+  </section>
+
+  <section class="py-12 bg-gray-50">
+    <div class="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="bg-white rounded-xl shadow-md p-8">
+        {success === '1' && (
+          <div class="bg-green-50 border border-green-200 text-green-800 rounded-lg p-4 mb-6">
+            ✅ Vizita a fost programată! Te contactăm pentru confirmare.
+          </div>
+        )}
+
+        <div class="mb-6 p-4 bg-blue-50 rounded-lg border border-blue-200">
+          <p class="text-sm text-blue-800">
+            📍 <strong>Locație:</strong> Calea E85 nr.37, Com. Mărăcineni, Buzău<br />
+            🕐 <strong>Program:</strong> Luni–Vineri 9:00–18:00, Sâmbătă 9:00–15:00
+          </p>
+        </div>
+
+        <form method="POST" action="/api/submit-form" class="space-y-4">
+          <input type="hidden" name="form_type" value="programare-vizita" />
+          <input type="hidden" name="redirect" value="/programeaza-vizita?success=1" />
+
+          <div class="grid sm:grid-cols-2 gap-4">
+            <div>
+              <label class="form-label">Nume și Prenume *</label>
+              <input type="text" name="nume" required class="form-input" />
+            </div>
+            <div>
+              <label class="form-label">Telefon *</label>
+              <input type="tel" name="telefon" required class="form-input" placeholder="07xx xxx xxx" />
+            </div>
+          </div>
+          <div>
+            <label class="form-label">Email</label>
+            <input type="email" name="email" class="form-input" />
+          </div>
+          <div>
+            <label class="form-label">Mașina de interes</label>
+            <input type="text" name="masina" class="form-input" value={masina} placeholder="Dacă știi exact ce vrei..." />
+          </div>
+          <div class="grid sm:grid-cols-2 gap-4">
+            <div>
+              <label class="form-label">Data dorită *</label>
+              <input type="date" name="data" required class="form-input" min={new Date().toISOString().split('T')[0]} />
+            </div>
+            <div>
+              <label class="form-label">Interval orar</label>
+              <select name="interval" class="form-select">
+                <option>09:00 – 11:00</option>
+                <option>11:00 – 13:00</option>
+                <option>13:00 – 15:00</option>
+                <option>15:00 – 17:00</option>
+              </select>
+            </div>
+          </div>
+          <div>
+            <label class="form-label">Scopul vizitei</label>
+            <select name="scop" class="form-select">
+              <option>Inspecție generală parc auto</option>
+              <option>Mașină specifică de văzut</option>
+              <option>Discuție despre finanțare</option>
+              <option>Altele</option>
+            </select>
+          </div>
+          <button type="submit" class="btn-primary w-full text-base py-3">
+            📅 Confirmă Programarea →
+          </button>
+        </form>
+      </div>
+    </div>
+  </section>
+</Layout>

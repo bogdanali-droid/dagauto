@@ -1,0 +1,109 @@
+---
+import Layout from '../layouts/Layout.astro';
+
+const success = Astro.url.searchParams.get('success');
+---
+
+<Layout
+  title="Comandă Specială - DAG Auto Buzău"
+  description="Nu găsești mașina dorită? Comandă special orice model, dotare sau culoare. DAG Auto te ajută să găsești exact ce vrei."
+>
+  <section class="bg-navy-900 text-white py-10" style="background-color: #0f2244;">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <h1 class="text-3xl md:text-4xl font-extrabold mb-2">Comandă Specială</h1>
+      <p class="text-gray-300">Nu găsești ce vrei? Comandăm pentru tine!</p>
+    </div>
+  </section>
+
+  <section class="py-12 bg-gray-50">
+    <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="bg-white rounded-xl shadow-md p-8">
+        <div class="mb-6 p-4 bg-orange-50 rounded-lg border border-orange-200">
+          <h2 class="font-bold text-orange-800 mb-1">📋 Cum funcționează?</h2>
+          <p class="text-sm text-orange-700">Completează formularul cu specificațiile mașinii dorite. Echipa noastră te va contacta în maxim 24 de ore cu disponibilitate și preț.</p>
+        </div>
+
+        {success === '1' && (
+          <div class="bg-green-50 border border-green-200 text-green-800 rounded-lg p-4 mb-6">
+            ✅ Cererea ta a fost înregistrată! Te contactăm în maxim 24 de ore.
+          </div>
+        )}
+
+        <form method="POST" action="/api/submit-form" class="space-y-4">
+          <input type="hidden" name="form_type" value="comanda-speciala" />
+          <input type="hidden" name="redirect" value="/comanda-speciala?success=1" />
+
+          <h3 class="text-lg font-bold text-gray-800 border-b pb-2">Date personale</h3>
+          <div class="grid sm:grid-cols-2 gap-4">
+            <div>
+              <label class="form-label">Nume și Prenume *</label>
+              <input type="text" name="nume" required class="form-input" placeholder="Numele complet" />
+            </div>
+            <div>
+              <label class="form-label">Telefon *</label>
+              <input type="tel" name="telefon" required class="form-input" placeholder="07xx xxx xxx" />
+            </div>
+          </div>
+          <div>
+            <label class="form-label">Email</label>
+            <input type="email" name="email" class="form-input" placeholder="email@exemplu.ro" />
+          </div>
+
+          <h3 class="text-lg font-bold text-gray-800 border-b pb-2 mt-6">Specificații mașină dorită</h3>
+          <div class="grid sm:grid-cols-2 gap-4">
+            <div>
+              <label class="form-label">Marcă *</label>
+              <input type="text" name="marca" required class="form-input" placeholder="ex: BMW, Volkswagen" />
+            </div>
+            <div>
+              <label class="form-label">Model *</label>
+              <input type="text" name="model" required class="form-input" placeholder="ex: X5, Golf" />
+            </div>
+          </div>
+          <div class="grid sm:grid-cols-3 gap-4">
+            <div>
+              <label class="form-label">An (de la)</label>
+              <input type="number" name="an_min" class="form-input" placeholder="2018" min="2010" max="2024" />
+            </div>
+            <div>
+              <label class="form-label">Km maxim</label>
+              <input type="number" name="km_max" class="form-input" placeholder="100000" />
+            </div>
+            <div>
+              <label class="form-label">Buget maxim (€)</label>
+              <input type="number" name="buget" class="form-input" placeholder="15000" />
+            </div>
+          </div>
+          <div class="grid sm:grid-cols-2 gap-4">
+            <div>
+              <label class="form-label">Combustibil preferat</label>
+              <select name="combustibil" class="form-select">
+                <option value="">Orice</option>
+                <option>Benzină</option>
+                <option>Diesel</option>
+                <option>Hibrid</option>
+                <option>Electric</option>
+                <option>GPL</option>
+              </select>
+            </div>
+            <div>
+              <label class="form-label">Transmisie</label>
+              <select name="transmisie" class="form-select">
+                <option value="">Orice</option>
+                <option>Manuală</option>
+                <option>Automată</option>
+              </select>
+            </div>
+          </div>
+          <div>
+            <label class="form-label">Dotări și preferințe specifice</label>
+            <textarea name="preferinte" rows="4" class="form-input resize-none" placeholder="Culoare, dotări speciale, alte preferințe..."></textarea>
+          </div>
+          <button type="submit" class="btn-primary w-full text-base py-3">
+            📋 Trimite Cererea →
+          </button>
+        </form>
+      </div>
+    </div>
+  </section>
+</Layout>

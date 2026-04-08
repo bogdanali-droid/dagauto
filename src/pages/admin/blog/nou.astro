@@ -1,0 +1,68 @@
+---
+import AdminLayout from '../../../layouts/AdminLayout.astro';
+import { createBlogPost, generateSlug } from '../../../lib/db';
+
+const { DB } = Astro.locals.runtime.env;
+let error = '';
+
+if (Astro.request.method === 'POST') {
+  try {
+    const data = await Astro.request.formData();
+    const title = data.get('title') as string;
+    const slug = generateSlug(title) + '-' + Date.now().toString(36);
+
+    await createBlogPost(DB, {
+      title,
+      slug,
+      content: data.get('content') as string,
+      excerpt: data.get('excerpt') as string,
+      image_url: data.get('image_url') as string,
+      status: (data.get('status') as 'published' | 'draft') || 'draft',
+    });
+
+    return Astro.redirect('/admin/blog?saved=1');
+  } catch (e) {
+    error = 'Eroare la salvare.';
+  }
+}
+---
+
+<AdminLayout title="Articol Nou">
+  <div class="max-w-3xl">
+    {error && <div class="bg-red-50 border border-red-200 text-red-700 rounded-lg p-4 mb-6">{error}</div>}
+
+    <form method="POST" class="space-y-6">
+      <div class="bg-white rounded-xl shadow-sm p-6 space-y-4">
+        <div>
+          <label class="form-label">Titlu *</label>
+          <input type="text" name="title" required class="form-input" placeholder="Titlul articolului" />
+        </div>
+        <div>
+          <label class="form-label">Rezumat (excerpt)</label>
+          <textarea name="excerpt" rows="2" class="form-input resize-none" placeholder="Scurt rezumat pentru listing..."></textarea>
+        </div>
+        <div>
+          <label class="form-label">URL Imagine principală</label>
+          <input type="text" name="image_url" class="form-input" placeholder="https://... sau /images/..." />
+        </div>
+        <div>
+          <label class="form-label">Conținut *</label>
+          <textarea name="content" rows="15" required class="form-input resize-none font-mono text-sm" placeholder="Conținut HTML sau text..."></textarea>
+          <p class="text-xs text-gray-400 mt-1">Poți folosi tag-uri HTML: &lt;p&gt;, &lt;h2&gt;, &lt;ul&gt;, &lt;strong&gt;, etc.</p>
+        </div>
+        <div>
+          <label class="form-label">Status</label>
+          <select name="status" class="form-select max-w-xs">
+            <option value="draft">Draft</option>
+            <option value="published">Publicat</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="flex gap-4">
+        <button type="submit" class="btn-primary">Publică Articolul →</button>
+        <a href="/admin/blog" class="btn-outline">Anulează</a>
+      </div>
+    </form>
+  </div>
+</AdminLayout>

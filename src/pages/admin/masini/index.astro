@@ -1,0 +1,65 @@
+---
+import AdminLayout from '../../../layouts/AdminLayout.astro';
+import { getCars } from '../../../lib/db';
+
+const { DB } = Astro.locals.runtime.env;
+const { results: cars } = await getCars(DB, { status: undefined, limit: 100 });
+
+const deleted = Astro.url.searchParams.get('deleted');
+const saved = Astro.url.searchParams.get('saved');
+---
+
+<AdminLayout title="Mașini">
+  <div class="space-y-6">
+    <div class="flex items-center justify-between">
+      <div>
+        {deleted && <p class="text-sm text-green-600">✅ Mașina a fost ștearsă.</p>}
+        {saved && <p class="text-sm text-green-600">✅ Mașina a fost salvată.</p>}
+      </div>
+      <a href="/admin/masini/nou" class="btn-primary">+ Adaugă Mașină</a>
+    </div>
+
+    <div class="bg-white rounded-xl shadow-sm overflow-hidden">
+      <div class="overflow-x-auto">
+        <table class="w-full text-sm">
+          <thead class="bg-gray-50 text-gray-500 uppercase text-xs">
+            <tr>
+              <th class="px-6 py-3 text-left">Titlu</th>
+              <th class="px-6 py-3 text-left">An</th>
+              <th class="px-6 py-3 text-left">Preț (€)</th>
+              <th class="px-6 py-3 text-left">Combustibil</th>
+              <th class="px-6 py-3 text-left">Status</th>
+              <th class="px-6 py-3 text-left">Acțiuni</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-gray-100">
+            {cars.map(car => (
+              <tr class="hover:bg-gray-50">
+                <td class="px-6 py-4 font-medium text-gray-800 max-w-xs truncate">{car.title}</td>
+                <td class="px-6 py-4 text-gray-600">{car.year}</td>
+                <td class="px-6 py-4 text-gray-600">{new Intl.NumberFormat('ro-RO').format(car.price)}</td>
+                <td class="px-6 py-4 text-gray-600">{car.fuel_type}</td>
+                <td class="px-6 py-4">
+                  <span class={`px-2 py-1 rounded-full text-xs font-medium ${
+                    car.status === 'available' ? 'bg-green-100 text-green-700' :
+                    car.status === 'sold' ? 'bg-red-100 text-red-700' :
+                    'bg-yellow-100 text-yellow-700'
+                  }`}>{car.status}</span>
+                </td>
+                <td class="px-6 py-4 flex items-center gap-3">
+                  <a href={`/admin/masini/${car.id}`} class="text-orange-500 hover:underline">Editează</a>
+                  <a href={`/parc-auto/${car.slug}`} target="_blank" class="text-gray-400 hover:text-gray-600 text-xs">↗ Site</a>
+                </td>
+              </tr>
+            ))}
+            {cars.length === 0 && (
+              <tr><td colspan="6" class="px-6 py-12 text-center text-gray-400">
+                Nicio mașină adăugată. <a href="/admin/masini/nou" class="text-orange-500 underline">Adaugă prima mașină →</a>
+              </td></tr>
+            )}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</AdminLayout>

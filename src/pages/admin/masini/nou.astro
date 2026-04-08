@@ -1,0 +1,155 @@
+---
+import AdminLayout from '../../../layouts/AdminLayout.astro';
+import { createCar, generateSlug } from '../../../lib/db';
+
+const { DB } = Astro.locals.runtime.env;
+let error = '';
+
+if (Astro.request.method === 'POST') {
+  try {
+    const data = await Astro.request.formData();
+    const title = data.get('title') as string;
+    const slug = generateSlug(title) + '-' + Date.now().toString(36);
+
+    await createCar(DB, {
+      title,
+      slug,
+      make: data.get('make') as string,
+      model: data.get('model') as string,
+      year: Number(data.get('year')),
+      price: Number(data.get('price')),
+      mileage: Number(data.get('mileage')),
+      fuel_type: data.get('fuel_type') as string,
+      transmission: data.get('transmission') as string,
+      body_type: data.get('body_type') as string,
+      color: data.get('color') as string,
+      engine_size: data.get('engine_size') as string,
+      power: Number(data.get('power')),
+      description: data.get('description') as string,
+      features: data.get('features') as string,
+      status: (data.get('status') as 'available' | 'sold' | 'reserved') || 'available',
+    });
+
+    const newCar = await DB.prepare('SELECT id FROM cars ORDER BY id DESC LIMIT 1').first<{ id: number }>();
+    return Astro.redirect(`/admin/masini/${newCar?.id}?saved=1`);
+  } catch (e) {
+    error = 'Eroare la salvare. Verifică datele introduse.';
+  }
+}
+---
+
+<AdminLayout title="Adaugă Mașină">
+  <div class="max-w-3xl">
+    {error && (
+      <div class="bg-red-50 border border-red-200 text-red-700 rounded-lg p-4 mb-6">{error}</div>
+    )}
+
+    <form method="POST" class="space-y-6">
+      <div class="bg-white rounded-xl shadow-sm p-6 space-y-4">
+        <h2 class="font-semibold text-gray-700 border-b pb-2">Informații Generale</h2>
+        <div>
+          <label class="form-label">Titlu anunț *</label>
+          <input type="text" name="title" required class="form-input" placeholder="ex: BMW X5 xDrive30d 2021 Full Option" />
+        </div>
+        <div class="grid sm:grid-cols-2 gap-4">
+          <div>
+            <label class="form-label">Marcă *</label>
+            <input type="text" name="make" required class="form-input" placeholder="BMW" />
+          </div>
+          <div>
+            <label class="form-label">Model *</label>
+            <input type="text" name="model" required class="form-input" placeholder="X5" />
+          </div>
+        </div>
+        <div class="grid sm:grid-cols-3 gap-4">
+          <div>
+            <label class="form-label">An fabricație *</label>
+            <input type="number" name="year" required class="form-input" min="2000" max="2025" />
+          </div>
+          <div>
+            <label class="form-label">Preț (€) *</label>
+            <input type="number" name="price" required class="form-input" min="0" />
+          </div>
+          <div>
+            <label class="form-label">Kilometraj *</label>
+            <input type="number" name="mileage" required class="form-input" min="0" />
+          </div>
+        </div>
+      </div>
+
+      <div class="bg-white rounded-xl shadow-sm p-6 space-y-4">
+        <h2 class="font-semibold text-gray-700 border-b pb-2">Specificații Tehnice</h2>
+        <div class="grid sm:grid-cols-2 gap-4">
+          <div>
+            <label class="form-label">Combustibil *</label>
+            <select name="fuel_type" required class="form-select">
+              <option>Benzină</option>
+              <option>Diesel</option>
+              <option>Hibrid</option>
+              <option>Electric</option>
+              <option>GPL</option>
+            </select>
+          </div>
+          <div>
+            <label class="form-label">Transmisie *</label>
+            <select name="transmission" required class="form-select">
+              <option>Manuală</option>
+              <option>Automată</option>
+            </select>
+          </div>
+          <div>
+            <label class="form-label">Caroserie *</label>
+            <select name="body_type" required class="form-select">
+              <option>Berlină</option>
+              <option>Break</option>
+              <option>SUV</option>
+              <option>Hatchback</option>
+              <option>Coupe</option>
+              <option>Cabrio</option>
+              <option>Monovolum</option>
+              <option>Pickup</option>
+            </select>
+          </div>
+          <div>
+            <label class="form-label">Culoare</label>
+            <input type="text" name="color" class="form-input" placeholder="Negru" />
+          </div>
+          <div>
+            <label class="form-label">Motor (ex: 2.0 TDI)</label>
+            <input type="text" name="engine_size" class="form-input" placeholder="2.0 TDI" />
+          </div>
+          <div>
+            <label class="form-label">Putere (CP)</label>
+            <input type="number" name="power" class="form-input" min="0" placeholder="190" />
+          </div>
+        </div>
+      </div>
+
+      <div class="bg-white rounded-xl shadow-sm p-6 space-y-4">
+        <h2 class="font-semibold text-gray-700 border-b pb-2">Descriere și Dotări</h2>
+        <div>
+          <label class="form-label">Descriere</label>
+          <textarea name="description" rows="5" class="form-input resize-none" placeholder="Descrie starea mașinii, istoricul, dotările speciale..."></textarea>
+        </div>
+        <div>
+          <label class="form-label">Dotări (separate prin virgulă)</label>
+          <textarea name="features" rows="3" class="form-input resize-none" placeholder="Navigație, Camere 360, Scaune încălzite, Panoramic..."></textarea>
+        </div>
+      </div>
+
+      <div class="bg-white rounded-xl shadow-sm p-6">
+        <h2 class="font-semibold text-gray-700 border-b pb-2 mb-4">Status</h2>
+        <select name="status" class="form-select max-w-xs">
+          <option value="available">Disponibil</option>
+          <option value="reserved">Rezervat</option>
+          <option value="sold">Vândut</option>
+        </select>
+      </div>
+
+      <div class="flex gap-4">
+        <button type="submit" class="btn-primary">Salvează Mașina →</button>
+        <a href="/admin/masini" class="btn-outline">Anulează</a>
+      </div>
+    </form>
+  </div>
+</AdminLayout>

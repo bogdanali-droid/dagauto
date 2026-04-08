@@ -1,0 +1,83 @@
+---
+import '../styles/global.css';
+
+interface Props {
+  title: string;
+}
+
+const { title } = Astro.props;
+const pathname = Astro.url.pathname;
+
+const navItems = [
+  { href: '/admin/dashboard', label: 'Dashboard', icon: '📊' },
+  { href: '/admin/masini', label: 'Mașini', icon: '🚗' },
+  { href: '/admin/blog', label: 'Blog', icon: '📝' },
+  { href: '/admin/submissions', label: 'Formulare', icon: '📬' },
+];
+---
+
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>{title} | Admin DAG Auto</title>
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <meta name="robots" content="noindex, nofollow" />
+</head>
+<body class="bg-gray-100 min-h-screen" style="font-family: 'Inter', system-ui, sans-serif;">
+  <div class="flex min-h-screen">
+    <!-- Sidebar -->
+    <aside class="w-64 bg-navy-900 text-white flex flex-col" style="background-color: #0a1a33;">
+      <div class="p-6 border-b border-white/10">
+        <a href="/" class="flex items-center gap-2">
+          <span class="text-2xl font-bold text-orange-500">DAG</span>
+          <span class="text-xl font-semibold">Auto</span>
+        </a>
+        <p class="text-xs text-gray-400 mt-1">Panou Administrare</p>
+      </div>
+      <nav class="flex-1 p-4">
+        <ul class="space-y-1">
+          {navItems.map(item => (
+            <li>
+              <a
+                href={item.href}
+                class={`flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${
+                  pathname.startsWith(item.href)
+                    ? 'bg-orange-500 text-white'
+                    : 'text-gray-300 hover:bg-white/10'
+                }`}
+              >
+                <span>{item.icon}</span>
+                <span>{item.label}</span>
+              </a>
+            </li>
+          ))}
+        </ul>
+      </nav>
+      <div class="p-4 border-t border-white/10">
+        <form action="/admin/logout" method="POST">
+          <button type="submit" class="w-full flex items-center gap-3 px-4 py-3 rounded-lg text-gray-300 hover:bg-white/10 transition-colors text-left">
+            <span>🚪</span>
+            <span>Deconectare</span>
+          </button>
+        </form>
+      </div>
+    </aside>
+
+    <!-- Main content -->
+    <div class="flex-1 flex flex-col">
+      <header class="bg-white shadow-sm px-8 py-4 flex items-center justify-between">
+        <h1 class="text-xl font-semibold text-gray-800">{title}</h1>
+        <a href="/" target="_blank" class="text-sm text-gray-500 hover:text-orange-500 transition-colors">
+          Vezi site →
+        </a>
+      </header>
+      <main class="flex-1 p-8">
+        <slot />
+      </main>
+    </div>
+  </div>
+</body>
+</html>

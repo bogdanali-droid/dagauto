@@ -1,0 +1,199 @@
+---
+import Layout from '../layouts/Layout.astro';
+import CarCard from '../components/CarCard.astro';
+import { getCars } from '../lib/db';
+
+const { DB } = Astro.locals.runtime.env;
+const { results: featuredCars } = await getCars(DB, { limit: 6 });
+
+const stats = [
+  { value: '500+', label: 'Mașini vândute' },
+  { value: '10+', label: 'Ani experiență' },
+  { value: '98%', label: 'Clienți mulțumiți' },
+  { value: '24h', label: 'Timp răspuns' },
+];
+
+const services = [
+  {
+    icon: '🚗',
+    title: 'Parc Auto Variat',
+    desc: 'Sute de mașini second hand verificate tehnic, de la mărci premium la accesibile.'
+  },
+  {
+    icon: '💳',
+    title: 'Finanțare Rapidă',
+    desc: 'Rate avantajoase prin parteneri bancari. Aprobare în 24 de ore, indiferent de venit.'
+  },
+  {
+    icon: '🔍',
+    title: 'Mașini Verificate',
+    desc: 'Fiecare mașină trece prin inspecție tehnică completă. Fără surprize neplăcute.'
+  },
+  {
+    icon: '📋',
+    title: 'Comandă Specială',
+    desc: 'Nu găsești ce vrei? Comandăm orice model, orice dotare, direct pentru tine.'
+  },
+];
+---
+
+<Layout title="DAG Auto Buzău - Mașini Second Hand de Calitate">
+  <!-- Hero Section -->
+  <section class="relative bg-navy-900 text-white overflow-hidden" style="background-color: #0a1a33;">
+    <div class="absolute inset-0 bg-gradient-to-br from-navy-900 via-navy-800 to-orange-900 opacity-90" style="background: linear-gradient(135deg, #0a1a33 0%, #0f2244 60%, #431407 100%);"></div>
+    <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 md:py-28">
+      <div class="max-w-3xl">
+        <p class="text-orange-400 font-semibold text-sm uppercase tracking-widest mb-4">Parc Auto Buzău</p>
+        <h1 class="text-4xl md:text-5xl lg:text-6xl font-extrabold leading-tight mb-6">
+          Mașina ta perfectă<br/>
+          <span class="text-orange-500">te așteaptă la DAG Auto</span>
+        </h1>
+        <p class="text-lg md:text-xl text-gray-300 mb-8 max-w-2xl">
+          Parc auto cu sute de mașini second hand verificate. Finanțare rapidă, garanție și service. Vizitează-ne în Buzău pe Calea E85.
+        </p>
+        <div class="flex flex-wrap gap-4">
+          <a href="/parc-auto" class="btn-primary text-base px-8 py-4">
+            🚗 Caută Mașina Ta
+          </a>
+          <a href="/cerere-finantare" class="btn-outline text-base px-8 py-4 border-white text-white hover:bg-white hover:text-navy-900">
+            💳 Cerere Finanțare
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Stats -->
+  <section class="bg-orange-500 py-8">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-6 text-white text-center">
+        {stats.map(s => (
+          <div>
+            <div class="text-3xl md:text-4xl font-extrabold">{s.value}</div>
+            <div class="text-sm font-medium opacity-90 mt-1">{s.label}</div>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- Featured Cars -->
+  <section class="py-16 bg-gray-50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="text-center mb-10">
+        <h2 class="section-title">Mașini Disponibile</h2>
+        <p class="section-subtitle">Ultimele adăugiri în parcul nostru auto</p>
+      </div>
+
+      {featuredCars.length > 0 ? (
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          {featuredCars.map(car => (
+            <CarCard {...car} />
+          ))}
+        </div>
+      ) : (
+        <div class="text-center py-12 text-gray-500">
+          <p class="text-xl mb-4">🚗 Stocul se actualizează în curând</p>
+          <p>Contactează-ne pentru disponibilitate.</p>
+        </div>
+      )}
+
+      <div class="text-center mt-10">
+        <a href="/parc-auto" class="btn-primary text-base px-10 py-4">
+          Vezi Toate Mașinile →
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Services -->
+  <section class="py-16 bg-white">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="text-center mb-10">
+        <h2 class="section-title">De Ce DAG Auto?</h2>
+        <p class="section-subtitle">Suntem partenerii tăi de încredere în Buzău</p>
+      </div>
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        {services.map(s => (
+          <div class="text-center p-6 rounded-xl border border-gray-100 hover:border-orange-200 hover:shadow-md transition-all">
+            <div class="text-4xl mb-4">{s.icon}</div>
+            <h3 class="font-bold text-navy-800 text-lg mb-2" style="color: #0f2244;">{s.title}</h3>
+            <p class="text-gray-600 text-sm leading-relaxed">{s.desc}</p>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- Forms CTA -->
+  <section class="py-16 bg-navy-900 text-white" style="background-color: #0f2244;">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="text-center mb-10">
+        <h2 class="text-3xl md:text-4xl font-bold mb-4">Servicii Personalizate</h2>
+        <p class="text-lg text-gray-300">Alege serviciul potrivit pentru tine</p>
+      </div>
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        {[
+          { href: '/comanda-speciala', label: 'Comandă Specială', icon: '📋', desc: 'Orice model, la cerere' },
+          { href: '/cerere-finantare', label: 'Cerere Finanțare', icon: '💳', desc: 'Rate personalizate' },
+          { href: '/test-drive', label: 'Test Drive', icon: '🏎️', desc: 'Încearcă înainte să cumperi' },
+          { href: '/programeaza-vizita', label: 'Programează Vizită', icon: '📅', desc: 'Vino fără așteptare' },
+        ].map(item => (
+          <a href={item.href} class="flex flex-col items-center text-center p-6 bg-white/10 rounded-xl hover:bg-orange-500 transition-all duration-300 group">
+            <span class="text-3xl mb-3">{item.icon}</span>
+            <span class="font-semibold text-white mb-1">{item.label}</span>
+            <span class="text-sm text-gray-300 group-hover:text-white/90">{item.desc}</span>
+          </a>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- Contact Section -->
+  <section class="py-16 bg-white">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="grid md:grid-cols-2 gap-12 items-center">
+        <div>
+          <h2 class="section-title">Vino Să Ne Vizitezi</h2>
+          <p class="text-gray-600 mb-6">Parcul nostru auto se află pe Calea E85 la intrarea în Buzău, ușor accesibil din toate direcțiile.</p>
+          <ul class="space-y-4">
+            {[
+              { icon: '📍', label: 'Adresă', value: 'Calea E85 nr.37, Com. Mărăcineni, Buzău' },
+              { icon: '📞', label: 'Telefon', value: '0721 586 534', href: 'tel:0721586534' },
+              { icon: '✉️', label: 'Email', value: 'contact@dagauto.ro', href: 'mailto:contact@dagauto.ro' },
+              { icon: '🕐', label: 'Program', value: 'Luni–Sâmbătă: 9:00–18:00' },
+            ].map(item => (
+              <li class="flex items-start gap-3">
+                <span class="text-2xl">{item.icon}</span>
+                <div>
+                  <span class="font-semibold text-gray-700 block text-sm">{item.label}</span>
+                  {item.href ? (
+                    <a href={item.href} class="text-orange-600 hover:underline">{item.value}</a>
+                  ) : (
+                    <span class="text-gray-600">{item.value}</span>
+                  )}
+                </div>
+              </li>
+            ))}
+          </ul>
+          <div class="flex gap-4 mt-8">
+            <a href="/contact" class="btn-primary">Trimite Mesaj</a>
+            <a href="/programeaza-vizita" class="btn-outline">Programează Vizită</a>
+          </div>
+        </div>
+        <div class="rounded-xl overflow-hidden shadow-lg h-80">
+          <iframe
+            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2811.5!2d26.8200!3d45.1500!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zDAG+Auto!5e0!3m2!1sro!2sro!4v1"
+            width="100%"
+            height="100%"
+            style="border:0;"
+            allowfullscreen=""
+            loading="lazy"
+            referrerpolicy="no-referrer-when-downgrade"
+            title="DAG Auto Buzău - Locație"
+          ></iframe>
+        </div>
+      </div>
+    </div>
+  </section>
+</Layout>

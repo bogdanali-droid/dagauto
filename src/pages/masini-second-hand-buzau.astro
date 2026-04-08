@@ -1,0 +1,101 @@
+---
+import Layout from '../layouts/Layout.astro';
+import CarCard from '../components/CarCard.astro';
+import { getCars } from '../lib/db';
+
+const { DB } = Astro.locals.runtime.env;
+const { results: cars } = await getCars(DB, { limit: 9 });
+---
+
+<Layout
+  title="Mașini Second Hand Buzău - DAG Auto"
+  description="Cel mai mare parc auto de mașini second hand din Buzău. Prețuri accesibile, mașini verificate, finanțare rapidă. DAG Auto pe E85."
+  canonicalUrl="https://dagauto.ro/masini-second-hand-buzau"
+>
+  <!-- SEO Hero -->
+  <section class="bg-navy-900 text-white py-12" style="background-color: #0f2244;">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <h1 class="text-3xl md:text-5xl font-extrabold mb-4">
+        Mașini Second Hand <span class="text-orange-500">Buzău</span>
+      </h1>
+      <p class="text-xl text-gray-300 max-w-2xl mb-6">
+        DAG Auto – parcul auto de încredere din Buzău. Sute de mașini second hand verificate, prețuri corecte și finanțare pe loc.
+      </p>
+      <div class="flex flex-wrap gap-4">
+        <a href="/parc-auto" class="btn-primary">Vezi Toate Mașinile</a>
+        <a href="tel:0721586534" class="btn-outline border-white text-white hover:bg-white hover:text-navy-900">
+          Sună Acum: 0721 586 534
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Why us - SEO content -->
+  <section class="py-12 bg-white">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <h2 class="section-title text-center">De Ce Să Cumperi Mașina Second Hand de la DAG Auto Buzău?</h2>
+      <div class="grid md:grid-cols-3 gap-6 mt-8">
+        {[
+          { icon: '🔍', title: 'Verificate Tehnic', desc: 'Fiecare mașină din parcul nostru trece printr-o inspecție tehnică completă înainte de a fi pusă la vânzare.' },
+          { icon: '📜', title: 'Acte în Regulă', desc: 'Toate mașinile au istoricul documentat, fără probleme juridice sau financiare.' },
+          { icon: '💳', title: 'Finanțare Rapidă', desc: 'Parteneriate cu bănci de top pentru rate avantajoase. Aprobare în 24 de ore.' },
+          { icon: '🛡️', title: 'Garanție', desc: 'Oferim garanție pentru mașinile vândute. Cumperi cu încredere.' },
+          { icon: '🔄', title: 'Schimb Mașină', desc: 'Poți da mașina ta veche în schimb și plăti doar diferența.' },
+          { icon: '🏎️', title: 'Test Drive', desc: 'Încearcă orice mașină din parc înainte să decizi. Fără presiune.' },
+        ].map(item => (
+          <div class="text-center p-6 border border-gray-100 rounded-xl hover:border-orange-200 hover:shadow-md transition-all">
+            <div class="text-4xl mb-3">{item.icon}</div>
+            <h3 class="font-bold text-navy-800 mb-2" style="color: #0f2244;">{item.title}</h3>
+            <p class="text-gray-600 text-sm">{item.desc}</p>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- Cars listing -->
+  <section class="py-12 bg-gray-50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <h2 class="section-title text-center">Mașini Second Hand Disponibile în Buzău</h2>
+      <p class="section-subtitle text-center">Stocul se actualizează zilnic</p>
+
+      {cars.length > 0 ? (
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+          {cars.map(car => <CarCard {...car} />)}
+        </div>
+      ) : (
+        <p class="text-center text-gray-500 py-8">Contactează-ne pentru disponibilitatea stocului.</p>
+      )}
+
+      <div class="text-center">
+        <a href="/parc-auto" class="btn-primary text-base px-10 py-4">
+          Vezi Toate Mașinile Second Hand →
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- SEO Text -->
+  <section class="py-12 bg-white">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 prose prose-lg">
+      <h2>Parc Auto Buzău – DAG Auto pe Calea E85</h2>
+      <p>
+        Dacă ești în căutarea unor <strong>mașini second hand în Buzău</strong>, DAG Auto este prima ta alegere. Situați pe <strong>Calea E85 nr.37, com. Mărăcineni</strong>, la marginea Buzăului, suntem ușor accesibili din toate direcțiile.
+      </p>
+      <p>
+        Parcul nostru auto oferă o gamă largă de mașini rulate: berlina, SUV-uri, hatchback-uri, break-uri și multe altele. Indiferent de buget, găsim mașina potrivită pentru tine.
+      </p>
+      <h3>Servicii complete de la DAG Auto Buzău</h3>
+      <ul>
+        <li>Vânzare mașini second hand verificate</li>
+        <li>Finanțare auto cu rate avantajoase</li>
+        <li>Schimb mașini (rate-in)</li>
+        <li>Comandă specială pentru orice model</li>
+        <li>Test drive gratuit</li>
+      </ul>
+      <p>
+        <strong>Contact DAG Auto Buzău:</strong> Sună-ne la <a href="tel:0721586534">0721 586 534</a> sau trimite un email la <a href="mailto:contact@dagauto.ro">contact@dagauto.ro</a>.
+      </p>
+    </div>
+  </section>
+</Layout>

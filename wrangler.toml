@@ -1,6 +1,9 @@
 name = "dagauto"
-main = "src/index.js"
-compatibility_date = "2024-01-01"
+main = "dist/_worker.js"
+compatibility_date = "2024-09-23"
+compatibility_flags = ["nodejs_compat"]
+
+pages_build_output_dir = "./dist"
 
 [[d1_databases]]
 binding = "DB"
@@ -10,3 +13,6 @@ database_id = "d9668a9a-a6f5-4232-86f2-ab0a96bc5a9f"
 [[r2_buckets]]
 binding = "IMAGES"
 bucket_name = "dagauto-images"
+
+[vars]
+SESSION_SECRET = "change-this-in-production-dashboard"

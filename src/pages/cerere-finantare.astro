@@ -1,0 +1,122 @@
+---
+import Layout from '../layouts/Layout.astro';
+
+const success = Astro.url.searchParams.get('success');
+const masina = Astro.url.searchParams.get('masina') || '';
+---
+
+<Layout
+  title="Cerere Finanțare - DAG Auto Buzău"
+  description="Solicită finanțare pentru mașina ta. Rate avantajoase, aprobare rapidă, fără avans. DAG Auto Buzău."
+>
+  <section class="bg-navy-900 text-white py-10" style="background-color: #0f2244;">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <h1 class="text-3xl md:text-4xl font-extrabold mb-2">Cerere Finanțare</h1>
+      <p class="text-gray-300">Rate avantajoase, aprobare în 24 de ore</p>
+    </div>
+  </section>
+
+  <section class="py-12 bg-gray-50">
+    <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
+      <!-- Benefits -->
+      <div class="grid grid-cols-3 gap-4 mb-8">
+        {[
+          { icon: '⚡', title: 'Aprobare Rapidă', desc: 'În 24 de ore' },
+          { icon: '💰', title: 'Rate Mici', desc: 'Doânzi avantajoase' },
+          { icon: '📄', title: 'Documente Minime', desc: 'Proces simplu' },
+        ].map(b => (
+          <div class="text-center bg-white p-4 rounded-xl shadow-sm">
+            <div class="text-3xl mb-2">{b.icon}</div>
+            <div class="font-bold text-gray-800 text-sm">{b.title}</div>
+            <div class="text-xs text-gray-500">{b.desc}</div>
+          </div>
+        ))}
+      </div>
+
+      <div class="bg-white rounded-xl shadow-md p-8">
+        {success === '1' && (
+          <div class="bg-green-50 border border-green-200 text-green-800 rounded-lg p-4 mb-6">
+            ✅ Cererea de finanțare a fost trimisă! Te contactăm în maxim 24 de ore cu oferta.
+          </div>
+        )}
+
+        <form method="POST" action="/api/submit-form" class="space-y-4">
+          <input type="hidden" name="form_type" value="cerere-finantare" />
+          <input type="hidden" name="redirect" value="/cerere-finantare?success=1" />
+
+          <h3 class="text-lg font-bold text-gray-800 border-b pb-2">Date personale</h3>
+          <div class="grid sm:grid-cols-2 gap-4">
+            <div>
+              <label class="form-label">Nume și Prenume *</label>
+              <input type="text" name="nume" required class="form-input" />
+            </div>
+            <div>
+              <label class="form-label">Telefon *</label>
+              <input type="tel" name="telefon" required class="form-input" placeholder="07xx xxx xxx" />
+            </div>
+          </div>
+          <div class="grid sm:grid-cols-2 gap-4">
+            <div>
+              <label class="form-label">Email *</label>
+              <input type="email" name="email" required class="form-input" />
+            </div>
+            <div>
+              <label class="form-label">CNP *</label>
+              <input type="text" name="cnp" required class="form-input" maxlength="13" placeholder="1234567890123" />
+            </div>
+          </div>
+
+          <h3 class="text-lg font-bold text-gray-800 border-b pb-2 mt-6">Detalii angajare</h3>
+          <div class="grid sm:grid-cols-2 gap-4">
+            <div>
+              <label class="form-label">Tip angajat</label>
+              <select name="tip_angajat" class="form-select">
+                <option>Angajat cu contract</option>
+                <option>PFA / Liber profesionist</option>
+                <option>Pensionar</option>
+                <option>Altele</option>
+              </select>
+            </div>
+            <div>
+              <label class="form-label">Venit lunar net (RON)</label>
+              <input type="number" name="venit" class="form-input" placeholder="3000" />
+            </div>
+          </div>
+
+          <h3 class="text-lg font-bold text-gray-800 border-b pb-2 mt-6">Detalii finanțare</h3>
+          <div>
+            <label class="form-label">Mașina dorită</label>
+            <input type="text" name="masina" class="form-input" value={masina} placeholder="ex: BMW X5 2020" />
+          </div>
+          <div class="grid sm:grid-cols-3 gap-4">
+            <div>
+              <label class="form-label">Valoare (€) *</label>
+              <input type="number" name="valoare" required class="form-input" placeholder="12000" />
+            </div>
+            <div>
+              <label class="form-label">Avans (€)</label>
+              <input type="number" name="avans" class="form-input" placeholder="0" />
+            </div>
+            <div>
+              <label class="form-label">Durată (luni)</label>
+              <select name="durata" class="form-select">
+                <option>24</option>
+                <option>36</option>
+                <option>48</option>
+                <option selected>60</option>
+                <option>72</option>
+              </select>
+            </div>
+          </div>
+          <div class="flex items-start gap-2 text-sm text-gray-600">
+            <input type="checkbox" required id="gdpr" class="mt-1" />
+            <label for="gdpr">Sunt de acord cu prelucrarea datelor personale *</label>
+          </div>
+          <button type="submit" class="btn-primary w-full text-base py-3">
+            💳 Trimite Cererea de Finanțare →
+          </button>
+        </form>
+      </div>
+    </div>
+  </section>
+</Layout>

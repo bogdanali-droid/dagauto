@@ -1,0 +1,68 @@
+---
+import AdminLayout from '../../../layouts/AdminLayout.astro';
+import { getFormSubmissions, markSubmissionRead } from '../../../lib/db';
+
+const { DB } = Astro.locals.runtime.env;
+
+const filterType = Astro.url.searchParams.get('type') || '';
+const { results: submissions } = await getFormSubmissions(DB, filterType || undefined, 100);
+
+const formTypes = ['contact', 'comanda-speciala', 'cerere-finantare', 'test-drive', 'programare-vizita'];
+
+// Auto-mark as read when viewing
+if (submissions.length > 0) {
+  for (const sub of submissions) {
+    if (!sub.read_at) {
+      await markSubmissionRead(DB, sub.id);
+    }
+  }
+}
+---
+
+<AdminLayout title="Formulare Trimise">
+  <div class="space-y-6">
+    <!-- Filter by type -->
+    <div class="flex flex-wrap gap-2">
+      <a href="/admin/submissions" class={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${!filterType ? 'bg-orange-500 text-white' : 'bg-white text-gray-600 hover:bg-orange-50'}`}>
+        Toate
+      </a>
+      {formTypes.map(t => (
+        <a href={`/admin/submissions?type=${t}`} class={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${filterType === t ? 'bg-orange-500 text-white' : 'bg-white text-gray-600 hover:bg-orange-50'}`}>
+          {t}
+        </a>
+      ))}
+    </div>
+
+    <div class="space-y-4">
+      {submissions.map(sub => {
+        let data: Record<string, string> = {};
+        try { data = JSON.parse(sub.data); } catch {}
+        return (
+          <div class={`bg-white rounded-xl shadow-sm p-6 ${!sub.read_at ? 'border-l-4 border-orange-500' : ''}`}>
+            <div class="flex items-start justify-between mb-3">
+              <div>
+                <span class="font-semibold text-gray-800 capitalize">{sub.form_type.replace(/-/g, ' ')}</span>
+                {!sub.read_at && <span class="ml-2 bg-orange-100 text-orange-700 text-xs px-2 py-0.5 rounded-full">Nou</span>}
+              </div>
+              <span class="text-xs text-gray-400">{new Date(sub.created_at).toLocaleString('ro-RO')}</span>
+            </div>
+            <div class="grid sm:grid-cols-2 gap-2">
+              {Object.entries(data).map(([key, val]) => val && (
+                <div class="text-sm">
+                  <span class="text-gray-500 capitalize">{key.replace(/_/g, ' ')}:</span>
+                  <span class="ml-1 text-gray-800 font-medium">{val}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        );
+      })}
+      {submissions.length === 0 && (
+        <div class="text-center py-16 bg-white rounded-xl shadow-sm text-gray-400">
+          <p class="text-4xl mb-3">📬</p>
+          <p>Niciun formular primit{filterType ? ` pentru tipul "${filterType}"` : ''}.</p>
+        </div>
+      )}
+    </div>
+  </div>
+</AdminLayout>

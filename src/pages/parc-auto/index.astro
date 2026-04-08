@@ -1,0 +1,110 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import CarCard from '../../components/CarCard.astro';
+import CarFilters from '../../components/CarFilters.astro';
+import { getCars, getDistinctMakes } from '../../lib/db';
+
+const { DB } = Astro.locals.runtime.env;
+
+const params = Astro.url.searchParams;
+const filters = {
+  make: params.get('make') || undefined,
+  fuel_type: params.get('fuel_type') || undefined,
+  transmission: params.get('transmission') || undefined,
+  body_type: params.get('body_type') || undefined,
+  min_price: params.get('min_price') ? Number(params.get('min_price')) : undefined,
+  max_price: params.get('max_price') ? Number(params.get('max_price')) : undefined,
+  min_year: params.get('min_year') ? Number(params.get('min_year')) : undefined,
+  max_year: params.get('max_year') ? Number(params.get('max_year')) : undefined,
+};
+
+const page = Number(params.get('page') || 1);
+const perPage = 12;
+
+const [carsResult, makesResult] = await Promise.all([
+  getCars(DB, { ...filters, limit: perPage, offset: (page - 1) * perPage }),
+  getDistinctMakes(DB),
+]);
+
+const cars = carsResult.results;
+const makes = makesResult.results.map(r => r.make);
+
+const currentFilters = {
+  make: params.get('make') || undefined,
+  fuel_type: params.get('fuel_type') || undefined,
+  transmission: params.get('transmission') || undefined,
+  body_type: params.get('body_type') || undefined,
+  min_price: params.get('min_price') || undefined,
+  max_price: params.get('max_price') || undefined,
+  min_year: params.get('min_year') || undefined,
+  max_year: params.get('max_year') || undefined,
+};
+
+const hasFilters = Object.values(currentFilters).some(Boolean);
+---
+
+<Layout
+  title="Parc Auto - Mașini Second Hand Buzău"
+  description="Caută mașina ta din parcul DAG Auto Buzău. Sute de mașini second hand verificate cu finanțare disponibilă."
+>
+  <!-- Hero -->
+  <section class="bg-navy-900 text-white py-10" style="background-color: #0f2244;">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <h1 class="text-3xl md:text-4xl font-extrabold mb-2">Parc Auto DAG</h1>
+      <p class="text-gray-300">Mașini second hand verificate în Buzău</p>
+    </div>
+  </section>
+
+  <section class="py-10 bg-gray-50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex flex-col lg:flex-row gap-8">
+        <!-- Sidebar Filters -->
+        <aside class="lg:w-72 shrink-0">
+          <CarFilters makes={makes} currentFilters={currentFilters} />
+        </aside>
+
+        <!-- Cars Grid -->
+        <div class="flex-1">
+          {hasFilters && (
+            <div class="mb-4 flex items-center gap-2 text-sm text-gray-600">
+              <span>Filtre active:</span>
+              {Object.entries(currentFilters).filter(([,v]) => v).map(([k, v]) => (
+                <span class="bg-orange-100 text-orange-700 px-2 py-1 rounded-full">{v}</span>
+              ))}
+              <a href="/parc-auto" class="text-red-500 hover:underline ml-2">✕ Șterge toate</a>
+            </div>
+          )}
+
+          {cars.length > 0 ? (
+            <>
+              <p class="text-sm text-gray-500 mb-4">{cars.length} mașini găsite</p>
+              <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-5">
+                {cars.map(car => <CarCard {...car} />)}
+              </div>
+              {cars.length === perPage && (
+                <div class="text-center mt-8">
+                  <a
+                    href={`/parc-auto?${new URLSearchParams({ ...Object.fromEntries(Object.entries(currentFilters).filter(([,v]) => v) as [string,string][]), page: String(page + 1) })}`}
+                    class="btn-secondary"
+                  >
+                    Pagina Următoare →
+                  </a>
+                </div>
+              )}
+            </>
+          ) : (
+            <div class="text-center py-16 bg-white rounded-xl shadow-sm">
+              <p class="text-5xl mb-4">🔍</p>
+              <h3 class="text-xl font-bold text-gray-700 mb-2">Nicio mașină găsită</h3>
+              <p class="text-gray-500 mb-6">Încearcă alte filtre sau contactează-ne pentru o comandă specială.</p>
+              <div class="flex justify-center gap-4">
+                <a href="/parc-auto" class="btn-outline">Resetează Filtrele</a>
+                <a href="/comanda-speciala" class="btn-primary">Comandă Specială</a>
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  </section>
+</Layout>

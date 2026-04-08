@@ -3,8 +3,11 @@ import Layout from '../layouts/Layout.astro';
 import CarCard from '../components/CarCard.astro';
 import { getCars } from '../lib/db';
 
-const { DB } = Astro.locals.runtime.env;
-const { results: cars } = await getCars(DB, { limit: 9 });
+let cars: any[] = [];
+try {
+  const DB = Astro.locals.runtime?.env?.DB;
+  if (DB) cars = (await getCars(DB, { limit: 9 })).results;
+} catch (e) { console.error('DB error seo:', e); }
 ---
 
 <Layout

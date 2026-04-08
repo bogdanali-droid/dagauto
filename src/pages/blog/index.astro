@@ -2,8 +2,11 @@
 import Layout from '../../layouts/Layout.astro';
 import { getBlogPosts } from '../../lib/db';
 
-const { DB } = Astro.locals.runtime.env;
-const { results: posts } = await getBlogPosts(DB, 'published', 20);
+let posts: any[] = [];
+try {
+  const DB = Astro.locals.runtime?.env?.DB;
+  if (DB) posts = (await getBlogPosts(DB, 'published', 20)).results;
+} catch (e) { console.error('DB error blog:', e); }
 ---
 
 <Layout

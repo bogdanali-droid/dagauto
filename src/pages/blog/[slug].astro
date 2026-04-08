@@ -3,7 +3,8 @@ import Layout from '../../layouts/Layout.astro';
 import { getBlogPostBySlug } from '../../lib/db';
 
 const { slug } = Astro.params;
-const { DB } = Astro.locals.runtime.env;
+const DB = Astro.locals.runtime?.env?.DB;
+if (!DB) return Astro.redirect('/blog');
 
 const post = await getBlogPostBySlug(DB, slug!);
 if (!post) return Astro.redirect('/blog');

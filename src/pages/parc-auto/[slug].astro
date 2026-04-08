@@ -3,7 +3,8 @@ import Layout from '../../layouts/Layout.astro';
 import { getCarBySlug, getCarImages } from '../../lib/db';
 
 const { slug } = Astro.params;
-const { DB } = Astro.locals.runtime.env;
+const DB = Astro.locals.runtime?.env?.DB;
+if (!DB) return Astro.redirect('/parc-auto');
 
 const car = await getCarBySlug(DB, slug!);
 if (!car) return Astro.redirect('/parc-auto');

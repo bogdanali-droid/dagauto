@@ -4,8 +4,6 @@ import CarCard from '../../components/CarCard.astro';
 import CarFilters from '../../components/CarFilters.astro';
 import { getCars, getDistinctMakes } from '../../lib/db';
 
-const { DB } = Astro.locals.runtime.env;
-
 const params = Astro.url.searchParams;
 const filters = {
   make: params.get('make') || undefined,
@@ -21,13 +19,19 @@ const filters = {
 const page = Number(params.get('page') || 1);
 const perPage = 12;
 
-const [carsResult, makesResult] = await Promise.all([
-  getCars(DB, { ...filters, limit: perPage, offset: (page - 1) * perPage }),
-  getDistinctMakes(DB),
-]);
-
-const cars = carsResult.results;
-const makes = makesResult.results.map(r => r.make);
+let cars: any[] = [];
+let makes: string[] = [];
+try {
+  const DB = Astro.locals.runtime?.env?.DB;
+  if (DB) {
+    const [carsResult, makesResult] = await Promise.all([
+      getCars(DB, { ...filters, limit: perPage, offset: (page - 1) * perPage }),
+      getDistinctMakes(DB),
+    ]);
+    cars = carsResult.results;
+    makes = makesResult.results.map((r: any) => r.make);
+  }
+} catch (e) { console.error('DB error parc-auto:', e); }
 
 const currentFilters = {
   make: params.get('make') || undefined,

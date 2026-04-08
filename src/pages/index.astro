@@ -3,8 +3,14 @@ import Layout from '../layouts/Layout.astro';
 import CarCard from '../components/CarCard.astro';
 import { getCars } from '../lib/db';
 
-const { DB } = Astro.locals.runtime.env;
-const { results: featuredCars } = await getCars(DB, { limit: 6 });
+let featuredCars: any[] = [];
+try {
+  const DB = Astro.locals.runtime?.env?.DB;
+  if (DB) {
+    const result = await getCars(DB, { limit: 6 });
+    featuredCars = result.results;
+  }
+} catch (e) { console.error('DB error index:', e); }
 
 const stats = [
   { value: '500+', label: 'Mașini vândute' },

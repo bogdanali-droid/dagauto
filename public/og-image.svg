@@ -1,0 +1,222 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" width="1200" height="630">
+  <defs>
+    <!-- Radial glow behind car silhouette -->
+    <radialGradient id="carGlow" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#f97316" stop-opacity="0.08"/>
+      <stop offset="100%" stop-color="#0f2244" stop-opacity="0"/>
+    </radialGradient>
+    <!-- Subtle top-left light sweep -->
+    <linearGradient id="bgSheen" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#162d5a" stop-opacity="1"/>
+      <stop offset="60%" stop-color="#0f2244" stop-opacity="1"/>
+      <stop offset="100%" stop-color="#091830" stop-opacity="1"/>
+    </linearGradient>
+    <!-- Orange glow filter for accent elements -->
+    <filter id="orangeGlow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="4" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+    <!-- Soft glow for the car -->
+    <filter id="softGlow" x="-10%" y="-10%" width="120%" height="120%">
+      <feGaussianBlur stdDeviation="8" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+
+  <!-- ═══════════════════════════════════════════════ -->
+  <!-- BACKGROUND                                      -->
+  <!-- ═══════════════════════════════════════════════ -->
+  <rect width="1200" height="630" fill="url(#bgSheen)"/>
+
+  <!-- Subtle grid lines for depth -->
+  <line x1="0" y1="0" x2="1200" y2="0" stroke="#ffffff" stroke-opacity="0.03" stroke-width="1"/>
+  <line x1="0" y1="630" x2="1200" y2="630" stroke="#ffffff" stroke-opacity="0.03" stroke-width="1"/>
+
+  <!-- Bottom ground line -->
+  <line x1="0" y1="510" x2="1200" y2="510" stroke="#f97316" stroke-opacity="0.18" stroke-width="1"/>
+
+  <!-- Diagonal speed lines (right side atmosphere) -->
+  <line x1="580" y1="0" x2="1200" y2="630" stroke="#ffffff" stroke-opacity="0.025" stroke-width="80"/>
+  <line x1="700" y1="0" x2="1200" y2="440" stroke="#ffffff" stroke-opacity="0.02" stroke-width="40"/>
+
+  <!-- Orange glow ellipse behind car -->
+  <ellipse cx="900" cy="370" rx="330" ry="200" fill="url(#carGlow)"/>
+
+  <!-- ═══════════════════════════════════════════════ -->
+  <!-- CAR SILHOUETTE (right side ghost)               -->
+  <!-- ═══════════════════════════════════════════════ -->
+
+  <!-- Car body shadow / ground reflection -->
+  <ellipse cx="870" cy="490" rx="280" ry="18" fill="#000000" fill-opacity="0.35"/>
+
+  <!-- Car body — rounded rectangle -->
+  <rect x="640" y="300" width="460" height="122" rx="18" ry="18"
+        fill="rgba(255,255,255,0.06)" stroke="rgba(255,255,255,0.15)" stroke-width="2"/>
+
+  <!-- Car roof — trapezoid using polygon -->
+  <polygon points="720,220 980,220 1020,300 680,300"
+           fill="rgba(255,255,255,0.06)" stroke="rgba(255,255,255,0.15)" stroke-width="2"/>
+
+  <!-- Windshield (front glass) -->
+  <polygon points="970,228 1010,298 930,298"
+           fill="rgba(255,255,255,0.04)" stroke="rgba(255,255,255,0.10)" stroke-width="1.5"/>
+
+  <!-- Rear glass -->
+  <polygon points="730,228 688,298 760,298"
+           fill="rgba(255,255,255,0.04)" stroke="rgba(255,255,255,0.10)" stroke-width="1.5"/>
+
+  <!-- Side windows (middle) -->
+  <polygon points="770,228 930,228 920,298 780,298"
+           fill="rgba(255,255,255,0.04)" stroke="rgba(255,255,255,0.08)" stroke-width="1"/>
+
+  <!-- Window divider pillar -->
+  <line x1="855" y1="228" x2="850" y2="298" stroke="rgba(255,255,255,0.12)" stroke-width="2"/>
+
+  <!-- Front bumper extension -->
+  <rect x="1100" y="340" width="40" height="50" rx="8"
+        fill="rgba(255,255,255,0.04)" stroke="rgba(255,255,255,0.12)" stroke-width="1.5"/>
+
+  <!-- Rear bumper extension -->
+  <rect x="640" y="340" width="-40" height="50" rx="8"
+        fill="rgba(255,255,255,0.04)" stroke="rgba(255,255,255,0.12)" stroke-width="1.5"/>
+
+  <!-- Headlight (front) -->
+  <rect x="1095" y="315" width="32" height="18" rx="4"
+        fill="#f97316" fill-opacity="0.35" stroke="#f97316" stroke-opacity="0.6" stroke-width="1"/>
+  <!-- Headlight glow -->
+  <rect x="1095" y="315" width="32" height="18" rx="4"
+        fill="none" stroke="#f97316" stroke-opacity="0.25" stroke-width="6"/>
+
+  <!-- Tail light (rear) -->
+  <rect x="645" y="315" width="28" height="18" rx="4"
+        fill="#f97316" fill-opacity="0.20" stroke="#f97316" stroke-opacity="0.4" stroke-width="1"/>
+
+  <!-- Door line detail -->
+  <line x1="860" y1="302" x2="858" y2="420" stroke="rgba(255,255,255,0.08)" stroke-width="1.5"/>
+
+  <!-- Wheel well arches -->
+  <path d="M 690,300 Q 740,300 790,300" stroke="rgba(255,255,255,0.10)" stroke-width="1" fill="none"/>
+  <path d="M 940,300 Q 1000,300 1060,300" stroke="rgba(255,255,255,0.10)" stroke-width="1" fill="none"/>
+
+  <!-- WHEELS -->
+  <!-- Rear wheel -->
+  <circle cx="740" cy="422" r="60"
+          fill="rgba(255,255,255,0.06)" stroke="rgba(255,255,255,0.18)" stroke-width="2"/>
+  <!-- Rear wheel inner rim -->
+  <circle cx="740" cy="422" r="38"
+          fill="rgba(255,255,255,0.04)" stroke="rgba(255,255,255,0.12)" stroke-width="1.5"/>
+  <!-- Rear wheel hub -->
+  <circle cx="740" cy="422" r="14"
+          fill="rgba(255,255,255,0.08)" stroke="#f97316" stroke-opacity="0.4" stroke-width="1.5"/>
+  <!-- Rear wheel spokes -->
+  <line x1="740" y1="384" x2="740" y2="460" stroke="rgba(255,255,255,0.10)" stroke-width="1.5"/>
+  <line x1="702" y1="422" x2="778" y2="422" stroke="rgba(255,255,255,0.10)" stroke-width="1.5"/>
+  <line x1="713" y1="395" x2="767" y2="449" stroke="rgba(255,255,255,0.07)" stroke-width="1.5"/>
+  <line x1="767" y1="395" x2="713" y2="449" stroke="rgba(255,255,255,0.07)" stroke-width="1.5"/>
+
+  <!-- Front wheel -->
+  <circle cx="1000" cy="422" r="60"
+          fill="rgba(255,255,255,0.06)" stroke="rgba(255,255,255,0.18)" stroke-width="2"/>
+  <!-- Front wheel inner rim -->
+  <circle cx="1000" cy="422" r="38"
+          fill="rgba(255,255,255,0.04)" stroke="rgba(255,255,255,0.12)" stroke-width="1.5"/>
+  <!-- Front wheel hub -->
+  <circle cx="1000" cy="422" r="14"
+          fill="rgba(255,255,255,0.08)" stroke="#f97316" stroke-opacity="0.4" stroke-width="1.5"/>
+  <!-- Front wheel spokes -->
+  <line x1="1000" y1="384" x2="1000" y2="460" stroke="rgba(255,255,255,0.10)" stroke-width="1.5"/>
+  <line x1="962" y1="422" x2="1038" y2="422" stroke="rgba(255,255,255,0.10)" stroke-width="1.5"/>
+  <line x1="973" y1="395" x2="1027" y2="449" stroke="rgba(255,255,255,0.07)" stroke-width="1.5"/>
+  <line x1="1027" y1="395" x2="973" y2="449" stroke="rgba(255,255,255,0.07)" stroke-width="1.5"/>
+
+  <!-- ═══════════════════════════════════════════════ -->
+  <!-- VERTICAL DIVIDER                               -->
+  <!-- ═══════════════════════════════════════════════ -->
+  <line x1="610" y1="80" x2="610" y2="550" stroke="#f97316" stroke-opacity="0.20" stroke-width="1"/>
+
+  <!-- ═══════════════════════════════════════════════ -->
+  <!-- LEFT SIDE — TEXT CONTENT                        -->
+  <!-- ═══════════════════════════════════════════════ -->
+
+  <!-- Orange accent bar -->
+  <rect x="80" y="80" width="6" height="80" rx="3" fill="#f97316" filter="url(#orangeGlow)"/>
+
+  <!-- "DAG" primary logotype -->
+  <text x="100" y="200"
+        font-family="'Arial Black', 'Arial', sans-serif"
+        font-size="120"
+        font-weight="800"
+        fill="#ffffff"
+        letter-spacing="-2">DAG</text>
+
+  <!-- "Auto" secondary logotype -->
+  <text x="100" y="285"
+        font-family="'Arial Black', 'Arial', sans-serif"
+        font-size="78"
+        font-weight="600"
+        fill="#f97316"
+        letter-spacing="2">Auto</text>
+
+  <!-- Thin separator line under brand -->
+  <line x1="100" y1="305" x2="560" y2="305" stroke="#f97316" stroke-opacity="0.30" stroke-width="1"/>
+
+  <!-- Tagline -->
+  <text x="100" y="355"
+        font-family="'Arial Black', 'Arial', sans-serif"
+        font-size="28"
+        font-weight="400"
+        fill="#ffffff"
+        opacity="0.70"
+        letter-spacing="0.5">Mașini second hand de calitate · Buzău</text>
+
+  <!-- Phone number with small icon representation -->
+  <!-- Phone dot indicator -->
+  <circle cx="108" cy="432" r="8" fill="#f97316" fill-opacity="0.85"/>
+  <text x="130" y="444"
+        font-family="'Arial Black', 'Arial', sans-serif"
+        font-size="34"
+        font-weight="700"
+        fill="#ffffff"
+        letter-spacing="1">0721 586 534</text>
+
+  <!-- Website -->
+  <text x="100" y="498"
+        font-family="'Arial Black', 'Arial', sans-serif"
+        font-size="28"
+        font-weight="600"
+        fill="#f97316"
+        opacity="0.90"
+        letter-spacing="1">dagauto.ro</text>
+
+  <!-- ═══════════════════════════════════════════════ -->
+  <!-- BOTTOM BAR                                      -->
+  <!-- ═══════════════════════════════════════════════ -->
+  <rect x="0" y="570" width="1200" height="60" fill="#000000" fill-opacity="0.25"/>
+  <!-- Bottom bar orange accent line -->
+  <rect x="0" y="570" width="1200" height="3" fill="#f97316" fill-opacity="0.60"/>
+
+  <!-- Bottom bar tagline text -->
+  <text x="80" y="603"
+        font-family="'Arial Black', 'Arial', sans-serif"
+        font-size="20"
+        font-weight="400"
+        fill="#ffffff"
+        opacity="0.45"
+        letter-spacing="3">DEALER AUTO · BUZĂU · ROMÂNIA</text>
+
+  <!-- Bottom bar right domain repeat -->
+  <text x="1120" y="603"
+        font-family="'Arial Black', 'Arial', sans-serif"
+        font-size="20"
+        font-weight="600"
+        fill="#f97316"
+        opacity="0.60"
+        text-anchor="end"
+        letter-spacing="1">dagauto.ro</text>
+</svg>

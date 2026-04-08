@@ -1,0 +1,61 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 56" fill="none" role="img" aria-label="DAG Auto logo">
+  <title>DAG Auto</title>
+
+  <!-- ═══════════════════════════════════════════
+       ICON / EMBLEM — shield with stylized D
+       Shield: clipped hexagonal shield shape
+       ═══════════════════════════════════════════ -->
+
+  <!-- Shield outline (navy fill, slight angular top + pointed base) -->
+  <path d="M4 6 L4 6 Q4 4 6 4 L42 4 Q44 4 44 6 L44 30 Q44 44 24 52 Q4 44 4 30 Z"
+        fill="#0f2244"/>
+
+  <!-- Stylized "D" letterform inside shield — bold geometric -->
+  <!-- Vertical stroke of D -->
+  <rect x="11" y="13" width="5.5" height="26" rx="0.5" fill="#ffffff"/>
+
+  <!-- D curve: a rounded rectangle right half creating the bow -->
+  <path d="M16 13 L25 13 Q34 13 34 26 Q34 39 25 39 L16 39 L16 34 L24 34 Q28.5 34 28.5 26 Q28.5 18 24 18 L16 18 Z"
+        fill="#ffffff"/>
+
+  <!-- Speed chevron / motion accent — orange, overlaid bottom-right of D -->
+  <path d="M29 30 L34.5 26 L29 22" stroke="#f97316" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+
+  <!-- ═══════════════════════════════════════════
+       WORDMARK — DAG Auto
+       ═══════════════════════════════════════════ -->
+
+  <!-- "DAG" — bold, navy, tight tracked -->
+  <text x="55"
+        y="30"
+        font-family="'Arial Black', 'Arial', 'Helvetica Neue', sans-serif"
+        font-size="22"
+        font-weight="900"
+        letter-spacing="1.5"
+        fill="#0f2244"
+        dominant-baseline="middle">DAG</text>
+
+  <!-- "Auto" — medium weight, navy, slightly smaller, same optical line -->
+  <text x="108"
+        y="30"
+        font-family="'Arial', 'Helvetica Neue', sans-serif"
+        font-size="19"
+        font-weight="400"
+        letter-spacing="0.5"
+        fill="#0f2244"
+        dominant-baseline="middle">Auto</text>
+
+  <!-- Orange accent bar under wordmark — thin rule echoing brand accent -->
+  <rect x="55" y="40" width="130" height="2.5" rx="1.25" fill="#f97316"/>
+
+  <!-- Tagline -->
+  <text x="55"
+        y="50"
+        font-family="'Arial', 'Helvetica Neue', sans-serif"
+        font-size="6.5"
+        font-weight="400"
+        letter-spacing="1.2"
+        fill="#0f2244"
+        opacity="0.65">MAȘINI DE CALITATE · BUZĂU</text>
+
+</svg>

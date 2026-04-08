@@ -1,5 +1,13 @@
 @import "tailwindcss";
 
+:root {
+  --color-navy: #0f2244;
+  --color-navy-dark: #0a1a33;
+  --color-navy-light: #1e3a5f;
+  --color-orange: #f97316;
+  --color-orange-dark: #ea6c0a;
+}
+
 @theme {
   --color-navy-50: #f0f4ff;
   --color-navy-100: #dce6ff;

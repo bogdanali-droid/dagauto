@@ -1,5 +1,83 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none">
+  <!-- Navy rounded-rectangle background -->
   <rect width="64" height="64" rx="12" fill="#0f2244"/>
-  <text x="8" y="46" font-family="Arial" font-weight="800" font-size="36" fill="#f97316">D</text>
-  <text x="32" y="46" font-family="Arial" font-weight="800" font-size="36" fill="#ffffff">A</text>
+
+  <!--
+    Geometric "D" built from a single compound path.
+    Outer shape: left bar (x 10–20) + right D-curve sweeping from (20,10) around to (20,54).
+    Inner cutout (even-odd): smaller D-curve leaving a bold stroke weight of ~7px on the curved side.
+
+    Outer path (clockwise):
+      M 10,10          top-left of bar
+      L 20,10          top of bar / start of outer curve
+      C 44,10 52,18 52,32   top cubic: control points pulling the curve right and down
+      C 52,46 44,54 20,54   bottom cubic: mirroring back down
+      L 10,54          bottom of bar
+      Z
+
+    Inner cutout (counter-clockwise for even-odd):
+      M 20,17          inner top
+      L 20,47          inner bottom
+      C 38,47 44,42 44,32   bottom cubic inner
+      C 44,22 38,17 20,17   top cubic inner
+      Z
+  -->
+  <path
+    fill-rule="evenodd"
+    fill="#ffffff"
+    d="
+      M 10,10
+      L 20,10
+      C 44,10 52,18 52,32
+      C 52,46 44,54 20,54
+      L 10,54
+      Z
+
+      M 20,17
+      L 20,47
+      C 38,47 44,42 44,32
+      C 44,22 38,17 20,17
+      Z
+    "
+  />
+
+  <!--
+    Orange chevron accent — two overlapping triangular slashes
+    in the lower-right quadrant of the D, suggesting speed/motion.
+    Clipped so it only shows inside the D glyph area.
+  -->
+  <clipPath id="d-clip">
+    <path
+      fill-rule="evenodd"
+      d="
+        M 10,10
+        L 20,10
+        C 44,10 52,18 52,32
+        C 52,46 44,54 20,54
+        L 10,54
+        Z
+
+        M 20,17
+        L 20,47
+        C 38,47 44,42 44,32
+        C 44,22 38,17 20,17
+        Z
+      "
+    />
+  </clipPath>
+
+  <!-- Chevron: two bold diagonal stripes, bottom-right of the D -->
+  <g clip-path="url(#d-clip)">
+    <!-- First stripe -->
+    <polygon
+      points="28,54 36,54 52,36 52,28"
+      fill="#f97316"
+    />
+    <!-- Second stripe (narrower, offset left for chevron rhythm) -->
+    <polygon
+      points="20,54 27,54 44,35 44,28"
+      fill="#f97316"
+      opacity="0.72"
+    />
+  </g>
 </svg>

@@ -1,19 +1,38 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 64" width="240" height="64">
-  <!-- Background: transparent -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 280 80" width="280" height="80">
+  <!-- Grup siluetă mașină, translat centrat stânga la ~x=10 -->
+  <g transform="translate(10, 5)">
+    <!-- Caroserie sedan -->
+    <path d="M5,35 L5,22 L20,10 L50,10 L65,22 L65,35 Z" fill="#1a1a2e"/>
 
-  <!-- Right-pointing chevron/arrow triangle, fill red -->
-  <!-- Triangle: left-top=(4,8), left-bottom=(4,56), right-tip=(44,32) -->
-  <polygon points="4,8 44,32 4,56" fill="#CC2200"/>
+    <!-- Geam față portocaliu -->
+    <path d="M22,22 L28,12 L45,12 L52,22 Z" fill="#f97316" opacity="0.9"/>
 
-  <!-- Letter D bold white overlaid on triangle -->
-  <text x="18" y="40" text-anchor="middle" font-family="Arial Black, Arial, sans-serif" font-size="24" font-weight="700" fill="#FFFFFF">D</text>
+    <!-- Roată față -->
+    <circle cx="18" cy="35" r="8" fill="#1a1a2e"/>
+    <circle cx="18" cy="35" r="4" fill="#ffffff"/>
 
-  <!-- DAG text -->
-  <text x="54" y="30" font-family="Arial Black, Arial, sans-serif" font-size="30" font-weight="900" fill="#1A1A1A" letter-spacing="2">DAG</text>
+    <!-- Roată spate -->
+    <circle cx="52" cy="35" r="8" fill="#1a1a2e"/>
+    <circle cx="52" cy="35" r="4" fill="#ffffff"/>
 
-  <!-- AUTO · BUZĂU text -->
-  <text x="54" y="44" font-family="Arial, sans-serif" font-size="9" font-weight="500" fill="#CC2200" letter-spacing="4">AUTO · BUZAU</text>
+    <!-- Linii de viteză în stânga mașinii -->
+    <line x1="-2" y1="18" x2="4" y2="18" stroke="#f97316" stroke-width="1.5"
+          opacity="0.6" stroke-linecap="round"/>
+    <line x1="-5" y1="23" x2="4" y2="23" stroke="#f97316" stroke-width="1.5"
+          opacity="0.6" stroke-linecap="round"/>
+    <line x1="-3" y1="28" x2="4" y2="28" stroke="#f97316" stroke-width="1.5"
+          opacity="0.6" stroke-linecap="round"/>
+  </g>
 
-  <!-- Red bottom line 3px height, full width -->
-  <rect x="0" y="60" width="240" height="3" fill="#CC2200"/>
+  <!-- Wordmark DAG AUTO centrat -->
+  <text x="140" y="60" font-size="28" font-weight="900" fill="#1a1a2e"
+        font-family="'Arial Black',Arial,sans-serif" letter-spacing="4"
+        text-anchor="middle">DAG AUTO</text>
+
+  <!-- Linie orange full-width -->
+  <rect x="0" y="65" width="280" height="3" fill="#f97316"/>
+
+  <!-- Tagline centrat -->
+  <text x="140" y="76" font-size="7" fill="#888" font-family="Arial,sans-serif"
+        letter-spacing="2" text-anchor="middle">MAȘINI DE CALITATE · BUZĂU</text>
 </svg>

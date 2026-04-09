@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 64" width="240" height="64">
+  <!-- Background: transparent -->
+
+  <!-- Hexagon regular 44x44, centered at (30, 32) -->
+  <!-- Flat-top hexagon: radius=22, centered at (30,32) -->
+  <!-- Points: (30+22,32), (30+11,32-19), (30-11,32-19), (30-22,32), (30-11,32+19), (30+11,32+19) -->
+  <polygon points="52,32 41,13 19,13 8,32 19,51 41,51" fill="none" stroke="#1D4ED8" stroke-width="2.5"/>
+
+  <!-- Letter D inside hexagon -->
+  <text x="30" y="39" text-anchor="middle" font-family="Arial Black, Arial, sans-serif" font-size="22" font-weight="800" fill="#1D4ED8">D</text>
+
+  <!-- Speed lines (3 diagonal parallel lines at ~45°) between hexagon and text -->
+  <line x1="56" y1="20" x2="62" y2="26" stroke="#1D4ED8" stroke-width="1.5" opacity="0.3"/>
+  <line x1="59" y1="18" x2="65" y2="24" stroke="#1D4ED8" stroke-width="1.5" opacity="0.3"/>
+  <line x1="62" y1="16" x2="68" y2="22" stroke="#1D4ED8" stroke-width="1.5" opacity="0.3"/>
+
+  <!-- DAG text -->
+  <text x="76" y="30" font-family="Arial Black, Arial, sans-serif" font-size="28" font-weight="900" fill="#0F172A" letter-spacing="2">DAG</text>
+
+  <!-- AUTO text, right-aligned under DAG -->
+  <text x="153" y="46" text-anchor="end" font-family="Arial, sans-serif" font-size="10" font-weight="600" fill="#1D4ED8" letter-spacing="5">AUTO</text>
+</svg>

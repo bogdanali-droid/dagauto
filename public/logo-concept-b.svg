@@ -1,42 +1,12 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 280 80" width="280" height="80">
-  <!-- Cerc exterior vitezometru -->
-  <circle cx="34" cy="40" r="30" stroke="#1a1a2e" stroke-width="3" fill="none"/>
-
-  <!-- Arc speedometer 180° superior — de la (8,40) la (60,40) prin vârf -->
-  <path d="M8,40 A26,26 0 0,1 60,40" stroke="#f97316" stroke-width="4"
-        fill="none" stroke-linecap="round"/>
-
-  <!-- 5 tick marks radiale uniform distribuite pe arc 180° -->
-  <!-- tick 0° (stânga, 180°) -->
-  <line x1="8" y1="40" x2="14" y2="40" stroke="#1a1a2e" stroke-width="1.5"/>
-  <!-- tick 45° (135°) -->
-  <line x1="15.6" y1="21.6" x2="19.8" y2="25.8" stroke="#1a1a2e" stroke-width="1.5"/>
-  <!-- tick 90° (sus, 90°) -->
-  <line x1="34" y1="14" x2="34" y2="20" stroke="#1a1a2e" stroke-width="1.5"/>
-  <!-- tick 135° (45°) -->
-  <line x1="52.4" y1="21.6" x2="48.2" y2="25.8" stroke="#1a1a2e" stroke-width="1.5"/>
-  <!-- tick 180° (dreapta, 0°) -->
-  <line x1="60" y1="40" x2="54" y2="40" stroke="#1a1a2e" stroke-width="1.5"/>
-
-  <!-- Ac indicator spre dreapta-sus -->
-  <line x1="34" y1="40" x2="52" y2="22" stroke="#f97316" stroke-width="2.5"
-        stroke-linecap="round"/>
-
-  <!-- Punct central -->
-  <circle cx="34" cy="40" r="3" fill="#1a1a2e"/>
-
-  <!-- km/h sub arc, în cerc -->
-  <text x="34" y="56" font-size="7" fill="#888" font-family="Arial,sans-serif"
-        text-anchor="middle">km/h</text>
-
-  <!-- Text DAG -->
-  <text x="74" y="42" font-size="34" font-weight="900" fill="#1a1a2e"
-        font-family="'Arial Black',Arial,sans-serif" letter-spacing="2">DAG</text>
-
-  <!-- Linie orange între DAG și AUTO -->
-  <rect x="74" y="46" width="85" height="2" fill="#f97316"/>
-
-  <!-- Text AUTO -->
-  <text x="74" y="58" font-size="11" font-weight="600" fill="#f97316"
-        font-family="Arial,sans-serif" letter-spacing="7">AUTO</text>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 72" width="320" height="72">
+  <!-- DAG ultra-bold -->
+  <text x="0" y="44" font-size="44" font-weight="900" fill="#0f2244" font-family="'Arial Black', Arial, sans-serif" letter-spacing="6">DAG</text>
+  <!-- Orange dot separator -->
+  <circle cx="152" cy="26" r="4" fill="#f97316"/>
+  <!-- AUTO light weight -->
+  <text x="168" y="44" font-size="44" font-weight="300" fill="#0f2244" font-family="Arial, sans-serif" letter-spacing="6">AUTO</text>
+  <!-- Full orange horizontal line -->
+  <rect x="0" y="52" width="320" height="3" fill="#f97316"/>
+  <!-- BUZĂU tagline below line -->
+  <text x="0" y="66" font-size="8.5" fill="#f97316" font-family="Arial, sans-serif" letter-spacing="6">BUZĂU</text>
 </svg>

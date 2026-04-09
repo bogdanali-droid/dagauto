@@ -1,29 +1,12 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 280 80" width="280" height="80">
-  <!-- Shield / Badge stânga -->
-  <path d="M26,10 L52,10 L52,50 L26,70 L0,50 L0,10 Z" fill="#0f2244"/>
-
-  <!-- Litera D în shield — bară verticală stânga -->
-  <rect x="10" y="22" width="7" height="36" fill="#f97316"/>
-  <!-- D — corp semicircular dreapta -->
-  <path d="M17,22 L17,58 Q38,58 38,40 Q38,22 17,22 Z" fill="#f97316"/>
-  <!-- Decupaj interior pentru D clasic -->
-  <path d="M19,27 L19,53 Q32,53 32,40 Q32,27 19,27 Z" fill="#0f2244"/>
-
-  <!-- Text DAG -->
-  <text x="62" y="38" font-size="32" font-weight="900" fill="#0f2244"
-        font-family="'Arial Black',Arial,sans-serif" letter-spacing="1">DAG</text>
-
-  <!-- Linie orange între DAG și AUTO -->
-  <rect x="62" y="44" width="80" height="2" fill="#f97316"/>
-
-  <!-- Text AUTO -->
-  <text x="62" y="56" font-size="13" font-weight="400" fill="#f97316"
-        font-family="Arial,sans-serif" letter-spacing="8">AUTO</text>
-
-  <!-- Linie subțire jos full-width -->
-  <rect x="0" y="74" width="280" height="1" fill="#0f2244"/>
-
-  <!-- Tagline centrat -->
-  <text x="140" y="78" font-size="7.5" fill="#888888" font-family="Arial,sans-serif"
-        letter-spacing="2.5" text-anchor="middle">DEALER CERTIFICAT · BUZĂU</text>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 72" width="320" height="72">
+  <!-- Navy block left -->
+  <rect x="0" y="0" width="140" height="72" fill="#0f2244"/>
+  <!-- DAG inside navy block -->
+  <text x="18" y="46" font-size="38" font-weight="900" fill="#ffffff" font-family="'Arial Black', Arial, sans-serif" letter-spacing="4">DAG</text>
+  <!-- Orange vertical separator -->
+  <rect x="140" y="12" width="4" height="48" fill="#f97316"/>
+  <!-- AUTO on white side -->
+  <text x="152" y="46" font-size="38" font-weight="900" fill="#0f2244" font-family="'Arial Black', Arial, sans-serif" letter-spacing="4">AUTO</text>
+  <!-- Tagline below, outside navy rect -->
+  <text x="0" y="66" font-size="9" fill="#888888" font-family="Arial, sans-serif" letter-spacing="3.5">DEALER AUTO · BUZĂU</text>
 </svg>

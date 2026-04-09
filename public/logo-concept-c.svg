@@ -1,38 +1,8 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 280 80" width="280" height="80">
-  <!-- Grup siluetă mașină, translat centrat stânga la ~x=10 -->
-  <g transform="translate(10, 5)">
-    <!-- Caroserie sedan -->
-    <path d="M5,35 L5,22 L20,10 L50,10 L65,22 L65,35 Z" fill="#1a1a2e"/>
-
-    <!-- Geam față portocaliu -->
-    <path d="M22,22 L28,12 L45,12 L52,22 Z" fill="#f97316" opacity="0.9"/>
-
-    <!-- Roată față -->
-    <circle cx="18" cy="35" r="8" fill="#1a1a2e"/>
-    <circle cx="18" cy="35" r="4" fill="#ffffff"/>
-
-    <!-- Roată spate -->
-    <circle cx="52" cy="35" r="8" fill="#1a1a2e"/>
-    <circle cx="52" cy="35" r="4" fill="#ffffff"/>
-
-    <!-- Linii de viteză în stânga mașinii -->
-    <line x1="-2" y1="18" x2="4" y2="18" stroke="#f97316" stroke-width="1.5"
-          opacity="0.6" stroke-linecap="round"/>
-    <line x1="-5" y1="23" x2="4" y2="23" stroke="#f97316" stroke-width="1.5"
-          opacity="0.6" stroke-linecap="round"/>
-    <line x1="-3" y1="28" x2="4" y2="28" stroke="#f97316" stroke-width="1.5"
-          opacity="0.6" stroke-linecap="round"/>
-  </g>
-
-  <!-- Wordmark DAG AUTO centrat -->
-  <text x="140" y="60" font-size="28" font-weight="900" fill="#1a1a2e"
-        font-family="'Arial Black',Arial,sans-serif" letter-spacing="4"
-        text-anchor="middle">DAG AUTO</text>
-
-  <!-- Linie orange full-width -->
-  <rect x="0" y="65" width="280" height="3" fill="#f97316"/>
-
-  <!-- Tagline centrat -->
-  <text x="140" y="76" font-size="7" fill="#888" font-family="Arial,sans-serif"
-        letter-spacing="2" text-anchor="middle">MAȘINI DE CALITATE · BUZĂU</text>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 72" width="320" height="72">
+  <!-- Thin navy left accent line -->
+  <rect x="0" y="8" width="3" height="55" fill="#0f2244"/>
+  <!-- DAG large, bold, very spaced -->
+  <text x="12" y="38" font-size="42" font-weight="900" fill="#0f2244" font-family="'Arial Black', Arial, sans-serif" letter-spacing="12">DAG</text>
+  <!-- AUTO small, orange, wide tracking as elegant subtext -->
+  <text x="14" y="60" font-size="16" font-weight="400" fill="#f97316" font-family="Arial, sans-serif" letter-spacing="22">AUTO</text>
 </svg>

@@ -33,6 +33,24 @@ const stats = [
   { value: '24h', label: 'Timp răspuns' },
 ];
 
+const quickBrands = [
+  { slug: 'dacia', label: 'Dacia' },
+  { slug: 'volkswagen', label: 'VW' },
+  { slug: 'bmw', label: 'BMW' },
+  { slug: 'ford', label: 'Ford' },
+  { slug: 'renault', label: 'Renault' },
+  { slug: 'opel', label: 'Opel' },
+  { slug: 'skoda', label: 'Skoda' },
+  { slug: 'toyota', label: 'Toyota' },
+  { slug: 'hyundai', label: 'Hyundai' },
+  { slug: 'audi', label: 'Audi' },
+  { slug: 'mercedes', label: 'Mercedes' },
+  { slug: 'kia', label: 'Kia' },
+];
+
+const currentYear = new Date().getFullYear();
+const years = Array.from({ length: 20 }, (_, i) => currentYear - i);
+
 const services = [
   {
     icon: '🚗',
@@ -71,7 +89,7 @@ const services = [
         <p class="text-lg md:text-xl text-gray-300 mb-8 max-w-2xl">
           Parc auto cu sute de mașini second hand verificate. Finanțare rapidă, garanție și service. Vizitează-ne în Buzău pe Calea E85.
         </p>
-        <div class="flex flex-wrap gap-4">
+        <div class="flex flex-wrap gap-4 mb-8">
           <a href="/parc-auto" class="btn-primary text-base px-8 py-4">
             🚗 Caută Mașina Ta
           </a>
@@ -79,6 +97,52 @@ const services = [
             💳 Cerere Finanțare
           </a>
         </div>
+
+        <!-- Quick Search Bar (zoom-automobile.ro style) -->
+        <form action="/parc-auto" method="GET" class="bg-white rounded-2xl p-3 shadow-2xl max-w-3xl">
+          <div class="grid grid-cols-2 md:grid-cols-4 gap-2">
+            <select name="make" class="text-gray-700 text-sm px-3 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-orange-400 bg-gray-50">
+              <option value="">Orice marcă</option>
+              {quickBrands.map(b => <option value={b.label === 'VW' ? 'Volkswagen' : b.label}>{b.label}</option>)}
+            </select>
+            <select name="min_year" class="text-gray-700 text-sm px-3 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-orange-400 bg-gray-50">
+              <option value="">An min</option>
+              {years.map(y => <option value={String(y)}>{y}</option>)}
+            </select>
+            <select name="max_price" class="text-gray-700 text-sm px-3 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-orange-400 bg-gray-50">
+              <option value="">Preț max</option>
+              {[5000,8000,10000,15000,20000,30000,50000].map(p => (
+                <option value={String(p)}>{new Intl.NumberFormat('ro-RO').format(p)} €</option>
+              ))}
+            </select>
+            <button type="submit" class="bg-orange-500 hover:bg-orange-600 text-white font-bold rounded-xl px-4 py-3 transition-colors flex items-center justify-center gap-2">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+              </svg>
+              Caută
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </section>
+
+  <!-- Brand Quick Filter -->
+  <section class="bg-white border-b border-gray-100 py-5">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex items-center gap-3 overflow-x-auto pb-1 scrollbar-hide">
+        <span class="text-xs font-semibold text-gray-400 uppercase tracking-widest shrink-0">Mărci:</span>
+        {quickBrands.map(b => (
+          <a
+            href={`/masini-second-hand/${b.slug}`}
+            class="shrink-0 px-5 py-2 rounded-full border border-gray-200 text-sm font-semibold text-gray-700 hover:border-orange-400 hover:text-orange-600 hover:bg-orange-50 transition-all whitespace-nowrap"
+          >
+            {b.label}
+          </a>
+        ))}
+        <a href="/parc-auto" class="shrink-0 px-5 py-2 rounded-full bg-orange-500 text-white text-sm font-semibold hover:bg-orange-600 transition-colors whitespace-nowrap">
+          Toate →
+        </a>
       </div>
     </div>
   </section>
@@ -171,6 +235,107 @@ const services = [
         <div class="flex flex-wrap gap-3 shrink-0">
           <a href="/contact" class="btn-primary">Solicită Evaluare</a>
           <a href="tel:0721586534" class="btn-outline border-white text-white hover:bg-white hover:text-navy-900">📞 Sună Acum</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Financing Partners / Parteneri Financiari -->
+  <section class="py-14 bg-white border-t border-gray-100">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="text-center mb-10">
+        <h2 class="text-2xl md:text-3xl font-extrabold text-gray-900 mb-2">Parteneri Financiari</h2>
+        <p class="text-gray-500">Calculează rata lunară direct pe site-ul băncii sau solicită finanțare prin noi</p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-5 mb-8">
+        <!-- BT - Banca Transilvania (primary partner) -->
+        <a
+          href="https://www.bancatransilvania.ro/persoane-fizice/credite/credite-auto/"
+          target="_blank"
+          rel="noopener"
+          class="group relative flex flex-col items-center justify-center gap-4 p-8 rounded-2xl border-2 border-orange-400 bg-orange-50 hover:bg-orange-100 hover:shadow-lg transition-all"
+        >
+          <div class="absolute top-3 right-3 bg-orange-500 text-white text-xs font-bold px-2 py-0.5 rounded-full">
+            Partener principal
+          </div>
+          <!-- BT Logo text representation -->
+          <div class="flex items-center gap-3">
+            <div class="w-14 h-14 rounded-xl flex items-center justify-center shadow-md" style="background: linear-gradient(135deg, #0f2244 0%, #1a3a6b 100%);">
+              <span class="text-white font-black text-2xl" style="font-family: 'Arial Black', sans-serif; letter-spacing: -1px;">BT</span>
+            </div>
+            <div class="text-left">
+              <div class="font-extrabold text-gray-900 text-lg leading-tight">Banca</div>
+              <div class="font-extrabold text-orange-600 text-lg leading-tight">Transilvania</div>
+            </div>
+          </div>
+          <div class="text-center">
+            <div class="text-sm text-gray-600 mb-2">Credit auto cu avans de la <span class="font-bold text-gray-900">15%</span></div>
+            <div class="text-sm text-gray-600">Dobândă fixă, aprobare rapidă</div>
+          </div>
+          <div class="flex items-center gap-2 bg-orange-500 group-hover:bg-orange-600 text-white font-bold text-sm px-5 py-2.5 rounded-xl transition-colors w-full justify-center">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 11h.01M12 11h.01M15 11h.01M4 19h16a2 2 0 002-2V7a2 2 0 00-2-2H4a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+            </svg>
+            Calculator Rate BT →
+          </div>
+        </a>
+
+        <!-- BCR -->
+        <a
+          href="https://www.bcr.ro/ro/persoane/credite/credit-auto"
+          target="_blank"
+          rel="noopener"
+          class="group flex flex-col items-center justify-center gap-4 p-8 rounded-2xl border border-gray-200 bg-gray-50 hover:border-blue-300 hover:bg-blue-50 hover:shadow-md transition-all"
+        >
+          <div class="flex items-center gap-3">
+            <div class="w-14 h-14 rounded-xl flex items-center justify-center shadow-sm" style="background: #003399;">
+              <span class="text-white font-black text-xl" style="font-family: 'Arial Black', sans-serif;">BCR</span>
+            </div>
+            <div class="text-left">
+              <div class="font-extrabold text-gray-900 text-lg leading-tight">BCR</div>
+              <div class="text-gray-500 text-sm">Credit auto</div>
+            </div>
+          </div>
+          <div class="text-sm text-gray-600 text-center">Finanțare flexibilă, până la 72 luni</div>
+          <div class="flex items-center gap-2 border border-blue-300 text-blue-700 font-semibold text-sm px-5 py-2.5 rounded-xl group-hover:bg-blue-600 group-hover:text-white group-hover:border-blue-600 transition-colors w-full justify-center">
+            Calculator Rate BCR →
+          </div>
+        </a>
+
+        <!-- ING -->
+        <a
+          href="https://www.ing.ro/persoane-fizice/credite/credit-auto.html"
+          target="_blank"
+          rel="noopener"
+          class="group flex flex-col items-center justify-center gap-4 p-8 rounded-2xl border border-gray-200 bg-gray-50 hover:border-orange-300 hover:bg-orange-50 hover:shadow-md transition-all"
+        >
+          <div class="flex items-center gap-3">
+            <div class="w-14 h-14 rounded-xl flex items-center justify-center shadow-sm" style="background: #ff6200;">
+              <span class="text-white font-black text-xl" style="font-family: 'Arial Black', sans-serif;">ING</span>
+            </div>
+            <div class="text-left">
+              <div class="font-extrabold text-gray-900 text-lg leading-tight">ING Bank</div>
+              <div class="text-gray-500 text-sm">Credit auto</div>
+            </div>
+          </div>
+          <div class="text-sm text-gray-600 text-center">Aprobare online, proces 100% digital</div>
+          <div class="flex items-center gap-2 border border-orange-300 text-orange-600 font-semibold text-sm px-5 py-2.5 rounded-xl group-hover:bg-orange-500 group-hover:text-white group-hover:border-orange-500 transition-colors w-full justify-center">
+            Calculator Rate ING →
+          </div>
+        </a>
+      </div>
+
+      <!-- CTA -->
+      <div class="bg-gray-900 rounded-2xl p-6 md:p-8 flex flex-col md:flex-row items-center justify-between gap-5" style="background: linear-gradient(135deg, #0f2244 0%, #1e3a6e 100%);">
+        <div>
+          <h3 class="text-xl font-bold text-white mb-1">Nu știi ce bancă să alegi?</h3>
+          <p class="text-gray-300 text-sm">Completează cererea noastră și te contactăm cu cea mai bună ofertă din piață.</p>
+        </div>
+        <div class="flex gap-3 shrink-0">
+          <a href="/cerere-finantare" class="bg-orange-500 hover:bg-orange-600 text-white font-bold px-6 py-3 rounded-xl transition-colors text-sm">
+            Solicită Ofertă →
+          </a>
         </div>
       </div>
     </div>

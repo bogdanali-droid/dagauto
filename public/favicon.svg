@@ -1,83 +1,53 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none">
-  <!-- Navy rounded-rectangle background -->
-  <rect width="64" height="64" rx="12" fill="#0f2244"/>
+  <!-- Navy rounded-square background -->
+  <rect width="64" height="64" rx="11" fill="#0f2244"/>
 
   <!--
-    Geometric "D" built from a single compound path.
-    Outer shape: left bar (x 10–20) + right D-curve sweeping from (20,10) around to (20,54).
-    Inner cutout (even-odd): smaller D-curve leaving a bold stroke weight of ~7px on the curved side.
-
-    Outer path (clockwise):
-      M 10,10          top-left of bar
-      L 20,10          top of bar / start of outer curve
-      C 44,10 52,18 52,32   top cubic: control points pulling the curve right and down
-      C 52,46 44,54 20,54   bottom cubic: mirroring back down
-      L 10,54          bottom of bar
-      Z
-
-    Inner cutout (counter-clockwise for even-odd):
-      M 20,17          inner top
-      L 20,47          inner bottom
-      C 38,47 44,42 44,32   bottom cubic inner
-      C 44,22 38,17 20,17   top cubic inner
-      Z
+    Bold geometric D letterform (even-odd for clean hole)
+    Outer D: left bar + sweeping right curve
+    Inner cutout: creates the counter-space
   -->
   <path
     fill-rule="evenodd"
     fill="#ffffff"
     d="
-      M 10,10
-      L 20,10
-      C 44,10 52,18 52,32
-      C 52,46 44,54 20,54
-      L 10,54
+      M 9,9
+      L 21,9
+      C 48,9 55,18 55,32
+      C 55,46 48,55 21,55
+      L 9,55
       Z
 
-      M 20,17
-      L 20,47
-      C 38,47 44,42 44,32
-      C 44,22 38,17 20,17
+      M 21,18
+      L 21,46
+      C 40,46 46,41 46,32
+      C 46,23 40,18 21,18
       Z
     "
   />
 
   <!--
-    Orange chevron accent — two overlapping triangular slashes
-    in the lower-right quadrant of the D, suggesting speed/motion.
-    Clipped so it only shows inside the D glyph area.
+    Full-width diagonal orange speed stripe
+    Clipped to the D glyph (filled area only via even-odd clip).
   -->
   <clipPath id="d-clip">
     <path
       fill-rule="evenodd"
       d="
-        M 10,10
-        L 20,10
-        C 44,10 52,18 52,32
-        C 52,46 44,54 20,54
-        L 10,54
-        Z
-
-        M 20,17
-        L 20,47
-        C 38,47 44,42 44,32
-        C 44,22 38,17 20,17
-        Z
+        M 9,9 L 21,9
+        C 48,9 55,18 55,32
+        C 55,46 48,55 21,55
+        L 9,55 Z
+        M 21,18 L 21,46
+        C 40,46 46,41 46,32
+        C 46,23 40,18 21,18 Z
       "
     />
   </clipPath>
 
-  <!-- Chevron: two bold diagonal stripes, bottom-right of the D -->
-  <g clip-path="url(#d-clip)">
-    <!-- First stripe -->
-    <polygon
-      points="28,54 36,54 52,36 52,28"
-      fill="#f97316"
-    />
-    <!-- Second stripe (narrower, offset left for chevron rhythm) -->
-    <polygon
-      points="20,54 27,54 44,35 44,28"
-      fill="#f97316"
-      opacity="0.72"
-    />
-  </g>
+  <polygon
+    points="26,9 55,9 22,55 0,55"
+    fill="#f97316"
+    clip-path="url(#d-clip)"
+  />
 </svg>

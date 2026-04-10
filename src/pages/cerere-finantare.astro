@@ -18,6 +18,34 @@ const masina = Astro.url.searchParams.get('masina') || '';
 
   <section class="py-12 bg-gray-50">
     <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
+
+      <!-- BT Banner - Calculator Rate -->
+      <div class="mb-8 rounded-2xl overflow-hidden shadow-lg border-2 border-orange-400">
+        <div class="flex flex-col sm:flex-row items-center gap-0">
+          <div class="flex-1 p-6 flex items-center gap-4" style="background: linear-gradient(135deg, #0f2244 0%, #1a3a6b 100%);">
+            <div class="w-16 h-16 rounded-xl flex items-center justify-center shrink-0 bg-white shadow">
+              <span class="font-black text-3xl" style="color: #0f2244; font-family: 'Arial Black', sans-serif; letter-spacing: -1px;">BT</span>
+            </div>
+            <div>
+              <div class="font-extrabold text-white text-xl">Banca Transilvania</div>
+              <div class="text-gray-300 text-sm">Partenerul nostru principal de finanțare</div>
+              <div class="text-orange-400 text-sm font-semibold mt-1">Credit auto · Dobândă fixă · Avans de la 15%</div>
+            </div>
+          </div>
+          <a
+            href="https://www.bancatransilvania.ro/persoane-fizice/credite/credite-auto/"
+            target="_blank"
+            rel="noopener"
+            class="flex items-center justify-center gap-2 bg-orange-500 hover:bg-orange-600 text-white font-extrabold text-base px-8 py-6 sm:h-full shrink-0 transition-colors w-full sm:w-auto"
+          >
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 11h.01M12 11h.01M15 11h.01M4 19h16a2 2 0 002-2V7a2 2 0 00-2-2H4a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+            </svg>
+            Calculator Rate BT →
+          </a>
+        </div>
+      </div>
+
       <!-- Benefits -->
       <div class="grid grid-cols-3 gap-4 mb-8">
         {[

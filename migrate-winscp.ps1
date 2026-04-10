@@ -15,11 +15,10 @@ $winscpDll = $winscpPaths | Where-Object { Test-Path $_ } | Select-Object -First
 
 if (-not $winscpDll) {
     Write-Host "WinSCP nu a fost gasit. Incerc cu FTP nativ..." -ForegroundColor Yellow
-    # Fallback: script WinSCP .txt
     $scriptPath = "$env:TEMP\winscp-script.txt"
     if (!(Test-Path $TEMP_DIR)) { New-Item -ItemType Directory -Path $TEMP_DIR | Out-Null }
     @"
-option batch abort
+ption batch abort
 option confirm off
 open ftp://claude:123Claude456+@dagauto.ro/
 lcd "$TEMP_DIR"
@@ -43,7 +42,6 @@ exit
         exit
     }
 } else {
-    # Foloseste WinSCP .NET assembly
     Add-Type -Path $winscpDll
 
     Write-Host "=== DAG Auto - Migrare Poze ===" -ForegroundColor Cyan
@@ -78,7 +76,6 @@ exit
     }
 }
 
-# Numara fisierele descarcate
 $imageFiles = Get-ChildItem $TEMP_DIR -Recurse -Include "*.jpg","*.jpeg","*.png","*.webp","*.gif"
 Write-Host ""
 Write-Host "Fisiere descarcate: $($imageFiles.Count)" -ForegroundColor Green
@@ -90,7 +87,6 @@ if ($imageFiles.Count -eq 0) {
     exit
 }
 
-# Upload pe site in batch-uri de 10
 Write-Host "Uploadeaza pe dagauto.ro in batches de 10..." -ForegroundColor Yellow
 $ok = 0; $noMatch = 0; $errors = 0
 $batchSize = 10
@@ -131,9 +127,9 @@ Write-Host ""
 Write-Host "==============================" -ForegroundColor Cyan
 Write-Host " REZULTAT FINAL" -ForegroundColor Cyan
 Write-Host "==============================" -ForegroundColor Cyan
-Write-Host " Migrate:       $ok" -ForegroundColor Green
+Write-Host " Migrate:        $ok" -ForegroundColor Green
 Write-Host " Fara potrivire: $noMatch" -ForegroundColor Yellow
-Write-Host " Erori:         $errors" -ForegroundColor $(if ($errors -eq 0) { "Green" } else { "Red" })
+Write-Host " Erori:          $errors" -ForegroundColor $(if ($errors -eq 0) { "Green" } else { "Red" })
 Write-Host "==============================" -ForegroundColor Cyan
 Write-Host ""
 

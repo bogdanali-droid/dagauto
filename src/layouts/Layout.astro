@@ -115,19 +115,18 @@ const fullTitle = title.includes('DAG Auto') ? title : `${title} | DAG Auto Buz�
     });
   </script>
 
-  <!-- Comparator Floating Tab (right side) -->
+  <!-- Comparator Floating Tab (right side, compact horizontal) -->
   <a
     href="/comparator"
     id="global-compare-btn"
-    class="fixed right-0 top-1/2 -translate-y-1/2 z-50 flex flex-col items-center gap-1.5 bg-orange-500 hover:bg-orange-600 text-white px-2 py-4 rounded-l-xl shadow-xl transition-all group cursor-pointer"
+    class="fixed right-4 top-1/2 -translate-y-1/2 z-50 flex flex-col items-center gap-1 bg-orange-500 hover:bg-orange-600 text-white px-3 py-3 rounded-xl shadow-xl transition-all"
     aria-label="Comparator mașini"
-    style="writing-mode: vertical-lr;"
   >
-    <svg class="w-5 h-5 shrink-0 rotate-90" style="writing-mode:horizontal-tb;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
     </svg>
-    <span class="text-xs font-extrabold tracking-widest uppercase" style="writing-mode:vertical-rl; text-orientation:mixed;">Compară</span>
-    <span id="global-compare-count" class="hidden w-5 h-5 bg-white text-orange-600 rounded-full text-xs font-black flex items-center justify-center" style="writing-mode:horizontal-tb;">0</span>
+    <span class="text-xs font-bold">Compară</span>
+    <span id="global-compare-count" class="hidden w-5 h-5 bg-white text-orange-600 rounded-full text-xs font-black items-center justify-center">0</span>
   </a>
 
   <script>

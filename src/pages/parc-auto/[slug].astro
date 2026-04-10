@@ -297,7 +297,7 @@ const schemaCar = {
                 Solicită Finanțare Acum →
               </a>
 
-              <!-- BT + TBI Calculator CTAs -->
+              <!-- BT + TBI + MOGO Calculator CTAs -->
               <div class="grid grid-cols-1 gap-2">
                 <a
                   href="https://www.bancatransilvania.ro/persoane-fizice/credite/credite-auto/"
@@ -325,6 +325,20 @@ const schemaCar = {
                   <div>
                     <div class="font-bold text-sm">Calculator TBI Bank</div>
                     <div class="text-xs opacity-50">Aprobare rapidă · avans minim →</div>
+                  </div>
+                </a>
+                <a
+                  href="https://www.mogo.ro/aplica"
+                  target="_blank" rel="noopener"
+                  class="flex items-center gap-3 p-3 rounded-xl border-2 border-green-600 hover:bg-green-600 hover:text-white transition-all group"
+                  style="color: #16a34a;"
+                >
+                  <div class="w-9 h-9 rounded-lg flex items-center justify-center shrink-0 bg-green-600">
+                    <span class="text-white font-black text-xs" style="font-family:'Arial Black',sans-serif;letter-spacing:-0.5px;">MOGO</span>
+                  </div>
+                  <div>
+                    <div class="font-bold text-sm">Leasing MOGO</div>
+                    <div class="text-xs opacity-50">Fără avans · fără venituri dovedite →</div>
                   </div>
                 </a>
               </div>
@@ -376,24 +390,33 @@ const schemaCar = {
                 class="btn-secondary w-full text-center block">
                 💳 Calculează Rata
               </a>
-              <div class="grid grid-cols-2 gap-2">
+              <div class="grid grid-cols-3 gap-2">
                 <a
                   href="https://www.bancatransilvania.ro/persoane-fizice/credite/credite-auto/"
                   target="_blank"
                   rel="noopener"
-                  class="flex items-center justify-center gap-1.5 py-2.5 px-3 rounded-lg font-bold text-xs transition-colors border-2 border-slate-800 hover:bg-slate-800 hover:text-white text-slate-800 bg-white"
+                  class="flex flex-col items-center justify-center gap-1 py-2.5 px-2 rounded-lg font-bold text-xs transition-colors border-2 border-slate-800 hover:bg-slate-800 hover:text-white text-slate-800 bg-white"
                 >
                   <span class="font-black text-sm" style="letter-spacing:-0.5px; font-family:'Arial Black',sans-serif;">BT</span>
-                  Rate BT
+                  <span>Rate BT</span>
                 </a>
                 <a
                   href="https://www.tbi.ro/credite/credit-auto/"
                   target="_blank"
                   rel="noopener"
-                  class="flex items-center justify-center gap-1.5 py-2.5 px-3 rounded-lg font-bold text-xs transition-colors border-2 border-blue-700 hover:bg-blue-700 hover:text-white text-blue-700 bg-white"
+                  class="flex flex-col items-center justify-center gap-1 py-2.5 px-2 rounded-lg font-bold text-xs transition-colors border-2 border-blue-700 hover:bg-blue-700 hover:text-white text-blue-700 bg-white"
                 >
                   <span class="font-black text-sm" style="letter-spacing:-0.5px; font-family:'Arial Black',sans-serif;">TBI</span>
-                  Rate TBI
+                  <span>Rate TBI</span>
+                </a>
+                <a
+                  href="https://www.mogo.ro/aplica"
+                  target="_blank"
+                  rel="noopener"
+                  class="flex flex-col items-center justify-center gap-1 py-2.5 px-2 rounded-lg font-bold text-xs transition-colors border-2 border-green-600 hover:bg-green-600 hover:text-white text-green-700 bg-white"
+                >
+                  <span class="font-black text-sm" style="letter-spacing:-0.5px; font-family:'Arial Black',sans-serif;">MOGO</span>
+                  <span>Leasing</span>
                 </a>
               </div>
               <a href={`/programeaza-vizita?masina=${encodeURIComponent(car.title)}`}

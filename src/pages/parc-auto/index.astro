@@ -151,17 +151,22 @@ function buildUrl(extra: Record<string, string | undefined>) {
     </div>
   </section>
 
-  <!-- Comparator bar (sticky bottom) -->
-  <div id="compare-bar" class="fixed bottom-0 left-0 right-0 z-40 bg-white border-t border-gray-200 shadow-2xl p-4 hidden">
-    <div class="max-w-7xl mx-auto flex items-center justify-between gap-4">
-      <div class="flex items-center gap-3">
-        <span class="font-bold text-gray-800">Comparator:</span>
-        <div id="compare-items" class="flex gap-2 flex-wrap"></div>
+  <!-- Comparator bar (floating, bottom-right) -->
+  <div id="compare-bar" class="fixed bottom-6 right-6 z-40 hidden">
+    <div class="bg-white rounded-2xl shadow-2xl border border-gray-200 p-4 w-72 max-w-[calc(100vw-3rem)]">
+      <div class="flex items-center justify-between mb-3">
+        <span class="font-extrabold text-gray-800 text-sm flex items-center gap-1.5">
+          <svg class="w-4 h-4 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
+          </svg>
+          Comparator
+        </span>
+        <button id="clear-compare" class="text-xs text-red-400 hover:text-red-600 font-medium">Golește</button>
       </div>
-      <div class="flex items-center gap-3 shrink-0">
-        <button id="clear-compare" class="text-sm text-red-500 hover:underline">Golește</button>
-        <a id="compare-link" href="/comparator" class="btn-primary text-sm">Compară →</a>
-      </div>
+      <div id="compare-items" class="flex flex-col gap-1.5 mb-3"></div>
+      <a id="compare-link" href="/comparator" class="btn-primary text-sm w-full text-center block">
+        Compară Mașinile →
+      </a>
     </div>
   </div>
 </Layout>
@@ -206,9 +211,9 @@ function buildUrl(extra: Record<string, string | undefined>) {
     bar.classList.remove('hidden');
     itemsEl.innerHTML = '';
     items.forEach(item => {
-      const span = document.createElement('span');
-      span.className = 'bg-orange-100 text-orange-800 text-xs font-medium px-2 py-1 rounded-full flex items-center gap-1';
-      span.innerHTML = `${item.title} <button data-id="${item.id}" class="remove-compare ml-1 text-orange-500 hover:text-red-500 font-bold">×</button>`;
+      const span = document.createElement('div');
+      span.className = 'flex items-center justify-between bg-orange-50 border border-orange-200 text-orange-900 text-xs font-medium px-3 py-1.5 rounded-lg';
+      span.innerHTML = `<span class="truncate mr-2">${item.title}</span><button data-id="${item.id}" class="remove-compare shrink-0 text-orange-400 hover:text-red-500 font-bold text-base leading-none">×</button>`;
       itemsEl.appendChild(span);
     });
     link.href = `/comparator?ids=${items.map(i => i.slug).join(',')}`;

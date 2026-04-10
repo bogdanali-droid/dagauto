@@ -14,14 +14,29 @@ interface Props {
   body_type?: string;
   featured?: number;
   primary_image?: string;
+  created_at?: string;
 }
 
-const { id, title, slug, year, price, old_price, mileage, fuel_type, transmission, featured, primary_image } = Astro.props;
+const { id, title, slug, year, price, old_price, mileage, fuel_type, transmission, featured, primary_image, created_at } = Astro.props;
 
 const formattedPrice = new Intl.NumberFormat('ro-RO').format(price);
 const formattedMileage = new Intl.NumberFormat('ro-RO').format(mileage);
 const hasDiscount = old_price && old_price > price;
 const discountPct = hasDiscount ? Math.round((1 - price / old_price!) * 100) : 0;
+
+// Rata lunara estimata (20% avans, 48 luni, 8.5% dobanda)
+const principal = price * 0.8;
+const monthlyRate = 0.085 / 12;
+const months = 48;
+const rata = Math.round(principal * (monthlyRate * Math.pow(1 + monthlyRate, months)) / (Math.pow(1 + monthlyRate, months) - 1));
+const formattedRata = new Intl.NumberFormat('ro-RO').format(rata);
+
+// Zile pe site
+const daysOnSite = created_at
+  ? Math.floor((Date.now() - new Date(created_at).getTime()) / (1000 * 60 * 60 * 24))
+  : null;
+
+const whatsappText = encodeURIComponent(`Bună ziua! Sunt interesat de ${title} (${year}, ${formattedPrice} €). Puteți să îmi dați mai multe detalii?`);
 ---
 
 <div class="group bg-white rounded-xl shadow-md hover:shadow-xl transition-all duration-300 overflow-hidden flex flex-col relative">
@@ -34,19 +49,36 @@ const discountPct = hasDiscount ? Math.round((1 - price / old_price!) * 100) : 0
       <span class="bg-red-500 text-white text-xs font-bold px-2 py-1 rounded-full shadow">-{discountPct}%</span>
     ) : null}
     <span class="bg-green-600 text-white text-xs font-semibold px-2 py-1 rounded-full shadow">✓ Garantie 12 luni</span>
+    {daysOnSite !== null && daysOnSite <= 3 ? (
+      <span class="bg-blue-600 text-white text-xs font-bold px-2 py-1 rounded-full shadow">🆕 NOU</span>
+    ) : null}
   </div>
 
-  <!-- Favorite button -->
-  <button
-    class="favorite-btn absolute top-3 right-3 z-10 w-9 h-9 bg-white/90 hover:bg-white rounded-full shadow flex items-center justify-center transition-all"
-    data-id={id}
-    data-title={title}
-    aria-label="Salvează mașina"
-  >
-    <svg class="w-5 h-5 heart-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
-    </svg>
-  </button>
+  <!-- Favorite + Compare buttons -->
+  <div class="absolute top-3 right-3 z-10 flex flex-col gap-1.5">
+    <button
+      class="favorite-btn w-9 h-9 bg-white/90 hover:bg-white rounded-full shadow flex items-center justify-center transition-all"
+      data-id={id}
+      data-title={title}
+      aria-label="Salvează mașina"
+    >
+      <svg class="w-5 h-5 heart-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
+      </svg>
+    </button>
+    <button
+      class="compare-btn w-9 h-9 bg-white/90 hover:bg-white rounded-full shadow flex items-center justify-center transition-all"
+      data-id={id}
+      data-title={title}
+      data-slug={slug}
+      aria-label="Adaugă la comparator"
+      title="Compară"
+    >
+      <svg class="w-4 h-4 compare-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
+      </svg>
+    </button>
+  </div>
 
   <a href={`/parc-auto/${slug}`} class="block">
     <!-- Image -->
@@ -63,6 +95,12 @@ const discountPct = hasDiscount ? Math.round((1 - price / old_price!) * 100) : 0
           <svg class="w-16 h-16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
           </svg>
+        </div>
+      )}
+      <!-- Days on site badge -->
+      {daysOnSite !== null && daysOnSite > 3 && (
+        <div class="absolute bottom-2 left-2 bg-black/50 text-white text-xs px-2 py-0.5 rounded-full">
+          {daysOnSite === 0 ? 'Adăugat azi' : daysOnSite === 1 ? 'Acum 1 zi' : `Acum ${daysOnSite} zile`}
         </div>
       )}
     </div>
@@ -92,29 +130,61 @@ const discountPct = hasDiscount ? Math.round((1 - price / old_price!) * 100) : 0
         </div>
       </div>
 
-      <div class="mt-auto pt-3 border-t border-gray-100 flex items-end justify-between">
-        <div>
-          {hasDiscount ? (
-            <div class="text-sm text-gray-400 line-through">{new Intl.NumberFormat('ro-RO').format(old_price!)} €</div>
-          ) : null}
-          <div class="text-xl font-extrabold text-orange-500">{formattedPrice} €</div>
+      <div class="mt-auto pt-3 border-t border-gray-100">
+        <div class="flex items-end justify-between mb-2">
+          <div>
+            {hasDiscount ? (
+              <div class="text-sm text-gray-400 line-through">{new Intl.NumberFormat('ro-RO').format(old_price!)} €</div>
+            ) : null}
+            <div class="text-xl font-extrabold text-orange-500">{formattedPrice} €</div>
+          </div>
+          <span class="text-orange-500 font-semibold text-sm group-hover:underline">
+            Vezi →
+          </span>
         </div>
-        <span class="text-orange-500 font-semibold text-sm group-hover:underline">
-          Vezi →
-        </span>
+        <!-- Rata lunara estimata -->
+        <div class="text-xs text-gray-500 bg-gray-50 rounded-lg px-2 py-1.5">
+          de la <span class="font-semibold text-gray-700">{formattedRata} €/lună</span>
+          <span class="text-gray-400"> (20% avans, 48 luni)</span>
+        </div>
       </div>
     </div>
   </a>
+
+  <!-- WhatsApp quick contact -->
+  <div class="px-4 pb-4">
+    <a
+      href={`https://wa.me/40721586534?text=${whatsappText}`}
+      target="_blank"
+      rel="noopener"
+      class="flex items-center justify-center gap-2 w-full py-2 bg-green-50 hover:bg-green-100 text-green-700 text-sm font-semibold rounded-lg transition-colors border border-green-200"
+      onclick="event.stopPropagation()"
+    >
+      <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+        <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
+      </svg>
+      Întreabă pe WhatsApp
+    </a>
+  </div>
 </div>
 
 <script>
-  // Favorites logic
+  // Favorites
   function getFavorites(): number[] {
     try { return JSON.parse(localStorage.getItem('dagauto_favorites') || '[]'); } catch { return []; }
   }
   function saveFavorites(ids: number[]) {
     localStorage.setItem('dagauto_favorites', JSON.stringify(ids));
     window.dispatchEvent(new Event('favorites-changed'));
+  }
+
+  // Comparator
+  function getCompare(): {id: number, title: string, slug: string}[] {
+    try { return JSON.parse(localStorage.getItem('dagauto_compare') || '[]'); } catch { return []; }
+  }
+  function saveCompare(items: {id: number, title: string, slug: string}[]) {
+    localStorage.setItem('dagauto_compare', JSON.stringify(items));
+    window.dispatchEvent(new Event('compare-changed'));
   }
 
   document.querySelectorAll('.favorite-btn').forEach(btn => {
@@ -141,5 +211,46 @@ const discountPct = hasDiscount ? Math.round((1 - price / old_price!) * 100) : 0
       }
       saveFavorites(current);
     });
+  });
+
+  document.querySelectorAll('.compare-btn').forEach(btn => {
+    const el = btn as HTMLElement;
+    const id = Number(el.dataset.id);
+    const title = el.dataset.title || '';
+    const slug = el.dataset.slug || '';
+    const icon = btn.querySelector('.compare-icon') as SVGElement;
+
+    function updateIcon() {
+      const items = getCompare();
+      const inCompare = items.some(i => i.id === id);
+      if (inCompare) {
+        icon.setAttribute('stroke', '#f97316');
+        (btn as HTMLElement).style.backgroundColor = '#fff7ed';
+      } else {
+        icon.setAttribute('stroke', 'currentColor');
+        (btn as HTMLElement).style.backgroundColor = '';
+      }
+    }
+    updateIcon();
+
+    btn.addEventListener('click', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      const current = getCompare();
+      const idx = current.findIndex(i => i.id === id);
+      if (idx === -1) {
+        if (current.length >= 3) {
+          alert('Poți compara maximum 3 mașini simultan.');
+          return;
+        }
+        current.push({ id, title, slug });
+      } else {
+        current.splice(idx, 1);
+      }
+      saveCompare(current);
+      updateIcon();
+    });
+
+    window.addEventListener('compare-changed', updateIcon);
   });
 </script>

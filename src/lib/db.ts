@@ -16,6 +16,18 @@ export interface Car {
   description: string;
   features: string;
   status: 'available' | 'sold' | 'reserved';
+  old_price?: number;
+  featured?: number;
+  // Câmpuri noi v2
+  doors?: number;
+  seats?: number;
+  drivetrain?: string;
+  vin?: string;
+  country_origin?: string;
+  nr_owners?: number;
+  service_history?: number;
+  accident_free?: number;
+  euro_standard?: string;
   created_at: string;
   updated_at: string;
 }
@@ -65,7 +77,12 @@ export async function getCars(db: D1Database, filters?: {
   max_price?: number;
   min_year?: number;
   max_year?: number;
+  min_power?: number;
+  max_power?: number;
+  drivetrain?: string;
+  accident_free?: boolean;
   status?: string;
+  sort?: string;
   limit?: number;
   offset?: number;
 }) {
@@ -80,10 +97,21 @@ export async function getCars(db: D1Database, filters?: {
   if (filters?.max_price) { query += ' AND c.price <= ?'; params.push(filters.max_price); }
   if (filters?.min_year) { query += ' AND c.year >= ?'; params.push(filters.min_year); }
   if (filters?.max_year) { query += ' AND c.year <= ?'; params.push(filters.max_year); }
+  if (filters?.min_power) { query += ' AND c.power >= ?'; params.push(filters.min_power); }
+  if (filters?.max_power) { query += ' AND c.power <= ?'; params.push(filters.max_power); }
+  if (filters?.drivetrain) { query += ' AND c.drivetrain = ?'; params.push(filters.drivetrain); }
+  if (filters?.accident_free) { query += ' AND c.accident_free = 1'; }
   if (filters?.status) { query += ' AND c.status = ?'; params.push(filters.status); }
   else { query += ' AND c.status = \'available\''; }
 
-  query += ' ORDER BY c.created_at DESC';
+  const sortMap: Record<string, string> = {
+    'price_asc': 'c.price ASC',
+    'price_desc': 'c.price DESC',
+    'year_desc': 'c.year DESC',
+    'mileage_asc': 'c.mileage ASC',
+    'newest': 'c.created_at DESC',
+  };
+  query += ` ORDER BY ${sortMap[filters?.sort || ''] || 'c.created_at DESC'}`;
   if (filters?.limit) { query += ' LIMIT ?'; params.push(filters.limit); }
   if (filters?.offset) { query += ' OFFSET ?'; params.push(filters.offset); }
 
@@ -104,12 +132,16 @@ export async function getCarImages(db: D1Database, carId: number) {
 
 export async function createCar(db: D1Database, car: Omit<Car, 'id' | 'created_at' | 'updated_at'>) {
   return db.prepare(`
-    INSERT INTO cars (title, slug, make, model, year, price, mileage, fuel_type, transmission, body_type, color, engine_size, power, description, features, status)
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    INSERT INTO cars (title, slug, make, model, year, price, mileage, fuel_type, transmission, body_type, color, engine_size, power, description, features, status, old_price, featured, doors, seats, drivetrain, vin, country_origin, nr_owners, service_history, accident_free, euro_standard)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
   `).bind(
     car.title, car.slug, car.make, car.model, car.year, car.price, car.mileage,
     car.fuel_type, car.transmission, car.body_type, car.color, car.engine_size,
-    car.power, car.description, car.features, car.status
+    car.power, car.description, car.features, car.status,
+    car.old_price || 0, car.featured || 0,
+    car.doors || 0, car.seats || 5, car.drivetrain || '', car.vin || '',
+    car.country_origin || '', car.nr_owners || 0,
+    car.service_history || 0, car.accident_free ?? 1, car.euro_standard || ''
   ).run();
 }
 

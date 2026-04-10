@@ -1,0 +1,139 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import CarCard from '../../components/CarCard.astro';
+import { getCars } from '../../lib/db';
+
+const marcaMap: Record<string, string> = {
+  'dacia': 'Dacia',
+  'volkswagen': 'Volkswagen',
+  'bmw': 'BMW',
+  'ford': 'Ford',
+  'renault': 'Renault',
+  'opel': 'Opel',
+  'skoda': 'Skoda',
+  'toyota': 'Toyota',
+  'hyundai': 'Hyundai',
+  'kia': 'Kia',
+  'peugeot': 'Peugeot',
+  'audi': 'Audi',
+  'mercedes': 'Mercedes-Benz',
+  'volvo': 'Volvo',
+  'seat': 'Seat',
+  'fiat': 'Fiat',
+  'nissan': 'Nissan',
+  'honda': 'Honda',
+};
+
+export function getStaticPaths() {
+  return Object.keys(marcaMap).map(slug => ({ params: { marca: slug } }));
+}
+
+const { marca } = Astro.params;
+const marcaName = marcaMap[marca!] || marca;
+
+let cars: any[] = [];
+try {
+  const DB = Astro.locals.runtime?.env?.DB;
+  if (DB) {
+    const result = await getCars(DB, { make: marcaName, limit: 12 });
+    cars = result.results;
+  }
+} catch {}
+
+const cityName = 'Buzău';
+const title = `${marcaName} Second Hand ${cityName} — Mașini Rulate Verificate`;
+const description = `Cumpără ${marcaName} second hand în ${cityName} la prețuri corecte. Toate mașinile ${marcaName} din parcul DAG Auto sunt verificate tehnic, cu garanție 12 luni și finanțare rapidă.`;
+---
+
+<Layout title={title} description={description}>
+  <!-- Hero -->
+  <section class="py-12 text-white" style="background-color: #0f2244;">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <nav class="text-sm text-gray-400 mb-4 flex items-center gap-2">
+        <a href="/" class="hover:text-orange-400">Acasă</a>
+        <span>/</span>
+        <a href="/parc-auto" class="hover:text-orange-400">Parc Auto</a>
+        <span>/</span>
+        <span class="text-gray-200">{marcaName}</span>
+      </nav>
+      <h1 class="text-3xl md:text-4xl font-extrabold mb-3">{marcaName} Second Hand {cityName}</h1>
+      <p class="text-gray-300 text-lg max-w-2xl">
+        Descoperă mașinile {marcaName} disponibile la DAG Auto {cityName}.
+        Toate verificate tehnic, cu garanție 12 luni și istoric transparent.
+      </p>
+    </div>
+  </section>
+
+  <!-- Avantaje -->
+  <section class="bg-orange-50 border-b border-orange-100 py-6">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex flex-wrap gap-6 justify-center sm:justify-start text-sm font-medium text-gray-700">
+        {['✓ Garanție 12 luni', '✓ Verificare tehnică completă', '✓ Finanțare în 24h', '✓ Istoric transparent', '✓ Test drive disponibil'].map(item => (
+          <span>{item}</span>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- Cars -->
+  <section class="py-12 bg-gray-50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      {cars.length > 0 ? (
+        <>
+          <div class="flex items-center justify-between mb-6">
+            <p class="text-gray-600">{cars.length} mașin{cars.length === 1 ? 'ă' : 'i'} {marcaName} disponibil{cars.length === 1 ? 'ă' : 'e'}</p>
+            <a href={`/parc-auto?make=${encodeURIComponent(marcaName)}`} class="text-orange-500 hover:underline text-sm font-medium">
+              Vezi toate →
+            </a>
+          </div>
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            {cars.map(car => <CarCard {...car} />)}
+          </div>
+          {cars.length === 12 && (
+            <div class="text-center mt-10">
+              <a href={`/parc-auto?make=${encodeURIComponent(marcaName)}`} class="btn-primary">
+                Vezi toate mașinile {marcaName} →
+              </a>
+            </div>
+          )}
+        </>
+      ) : (
+        <div class="text-center py-16 bg-white rounded-xl shadow-sm">
+          <p class="text-5xl mb-4">🔍</p>
+          <h3 class="text-xl font-bold text-gray-700 mb-2">Nu avem {marcaName} în stoc momentan</h3>
+          <p class="text-gray-500 mb-6">Lasă-ne datele tale și te anunțăm când primim un {marcaName}.</p>
+          <a href={`/comanda-speciala?marca=${encodeURIComponent(marcaName)}`} class="btn-primary">
+            Comandă {marcaName} Special →
+          </a>
+        </div>
+      )}
+    </div>
+  </section>
+
+  <!-- SEO Content -->
+  <section class="py-12 bg-white">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+      <h2 class="text-2xl font-bold mb-6" style="color: #0f2244;">De ce să cumperi {marcaName} second hand de la DAG Auto {cityName}?</h2>
+      <div class="prose prose-gray max-w-none">
+        <p class="text-gray-700 leading-relaxed mb-4">
+          DAG Auto {cityName} este dealer de mașini second hand cu peste 10 ani de experiență în vânzarea de autoturisme {marcaName} rulate în județul Buzău și împrejurimi.
+          Fiecare {marcaName} din parcul nostru trece printr-o verificare tehnică riguroasă înainte de a fi pus în vânzare.
+        </p>
+        <p class="text-gray-700 leading-relaxed mb-4">
+          Oferim garanție 12 luni pe motor și cutie de viteze pentru toate mașinile {marcaName} din stoc, indiferent de an sau kilometraj.
+          Poți solicita un test drive gratuit și poți vizualiza istoricul complet al vehiculului prin raportul carVertical.
+        </p>
+        <p class="text-gray-700 leading-relaxed">
+          Ai nevoie de finanțare? Îți oferim soluții de rate cu avans de la 10%, aprobate în maximum 24 de ore.
+          Contactează-ne pe WhatsApp sau vizitează showroom-ul nostru din Buzău.
+        </p>
+      </div>
+
+      <div class="mt-8 flex flex-wrap gap-4">
+        <a href="/test-drive" class="btn-primary">Solicită Test Drive</a>
+        <a href="/cerere-finantare" class="btn-outline">Calculează Rate</a>
+        <a href="/contact" class="btn-outline">Contactează-ne</a>
+      </div>
+    </div>
+  </section>
+</Layout>

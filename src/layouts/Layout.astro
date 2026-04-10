@@ -46,24 +46,33 @@ const fullTitle = title.includes('DAG Auto') ? title : `${title} | DAG Auto Buz�
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
 
-  <!-- Schema.org -->
-  <script type="application/ld+json">
-    {JSON.stringify({
-      "@context": "https://schema.org",
-      "@type": "AutoDealer",
-      "name": "DAG Auto",
-      "url": siteUrl,
-      "telephone": "0721586534",
-      "email": "contact@dagauto.ro",
-      "address": {
-        "@type": "PostalAddress",
-        "streetAddress": "Calea E85 nr.37",
-        "addressLocality": "Com. Mărăcineni",
-        "addressRegion": "Buzău",
-        "addressCountry": "RO"
-      }
-    })}
-  </script>
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content={fullTitle} />
+  <meta name="twitter:description" content={description} />
+  <meta name="twitter:image" content={`${siteUrl}${image}`} />
+
+  <!-- Schema.org AutoDealer -->
+  <script type="application/ld+json" set:html={JSON.stringify({
+    "@context": "https://schema.org",
+    "@type": "AutoDealer",
+    "name": "DAG Auto",
+    "url": siteUrl,
+    "telephone": "0721586534",
+    "email": "contact@dagauto.ro",
+    "address": {
+      "@type": "PostalAddress",
+      "streetAddress": "Calea E85 nr.37",
+      "addressLocality": "Com. Mărăcineni",
+      "addressRegion": "Buzău",
+      "addressCountry": "RO"
+    },
+    "openingHours": "Mo-Fr 09:00-18:00",
+    "priceRange": "€€"
+  })} />
+
+  <!-- Slot for page-specific head content (eg. Schema.org Car) -->
+  <slot name="head" />
 </head>
 <body class="bg-white text-gray-900" style="font-family: 'Inter', system-ui, sans-serif;">
   <Header />
@@ -71,6 +80,40 @@ const fullTitle = title.includes('DAG Auto') ? title : `${title} | DAG Auto Buz�
     <slot />
   </main>
   <Footer />
+
+  <!-- Cookie Consent GDPR -->
+  <div id="cookie-banner" class="fixed bottom-0 left-0 right-0 z-[60] bg-gray-900 text-white p-4 shadow-2xl hidden">
+    <div class="max-w-7xl mx-auto flex flex-col sm:flex-row items-start sm:items-center gap-4 justify-between">
+      <p class="text-sm text-gray-300 flex-1">
+        Folosim cookie-uri pentru a îmbunătăți experiența ta pe site. Prin continuarea navigării, ești de acord cu
+        <a href="/politica-cookies" class="text-orange-400 hover:underline">Politica de Cookies</a> și
+        <a href="/politica-confidentialitate" class="text-orange-400 hover:underline">Politica de Confidențialitate</a>.
+      </p>
+      <div class="flex gap-3 shrink-0">
+        <button id="cookie-decline" class="text-sm px-4 py-2 border border-gray-600 rounded-lg hover:bg-gray-800 transition-colors">
+          Refuz
+        </button>
+        <button id="cookie-accept" class="text-sm px-4 py-2 bg-orange-500 hover:bg-orange-600 text-white rounded-lg font-semibold transition-colors">
+          Accept toate
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const banner = document.getElementById('cookie-banner');
+    const consent = localStorage.getItem('dagauto_cookie_consent');
+    if (!consent && banner) banner.classList.remove('hidden');
+
+    document.getElementById('cookie-accept')?.addEventListener('click', () => {
+      localStorage.setItem('dagauto_cookie_consent', 'accepted');
+      banner?.classList.add('hidden');
+    });
+    document.getElementById('cookie-decline')?.addEventListener('click', () => {
+      localStorage.setItem('dagauto_cookie_consent', 'declined');
+      banner?.classList.add('hidden');
+    });
+  </script>
 
   <!-- WhatsApp Floating Button -->
   <a href="https://wa.me/40721586534?text=Bun%C4%83%20ziua!%20Sunt%20interesat%20de%20ma%C8%99inile%20dumneavoastr%C4%83."

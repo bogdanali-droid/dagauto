@@ -14,8 +14,8 @@ if (Astro.request.method === 'POST') {
     const oldPrice = Number(data.get('old_price')) || 0;
     const featured = data.get('featured') === '1' ? 1 : 0;
     await DB.prepare(`
-      INSERT INTO cars (title, slug, make, model, year, price, mileage, fuel_type, transmission, body_type, color, engine_size, power, description, features, status, old_price, featured)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      INSERT INTO cars (title, slug, make, model, year, price, mileage, fuel_type, transmission, body_type, color, engine_size, power, description, features, status, old_price, featured, doors, seats, drivetrain, vin, country_origin, nr_owners, service_history, accident_free, euro_standard)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `).bind(
       title, slug,
       data.get('make'), data.get('model'),
@@ -26,7 +26,16 @@ if (Astro.request.method === 'POST') {
       Number(data.get('power')) || 0,
       data.get('description') || '', data.get('features') || '',
       data.get('status') || 'available',
-      oldPrice, featured
+      oldPrice, featured,
+      Number(data.get('doors')) || 0,
+      Number(data.get('seats')) || 5,
+      data.get('drivetrain') || '',
+      data.get('vin') || '',
+      data.get('country_origin') || '',
+      Number(data.get('nr_owners')) || 0,
+      data.get('service_history') === '1' ? 1 : 0,
+      data.get('accident_free') === '0' ? 0 : 1,
+      data.get('euro_standard') || ''
     ).run();
 
     const newCar = await DB.prepare('SELECT id FROM cars ORDER BY id DESC LIMIT 1').first<{ id: number }>();
@@ -120,6 +129,68 @@ if (Astro.request.method === 'POST') {
           <div>
             <label class="form-label">Putere (CP)</label>
             <input type="number" name="power" class="form-input" min="0" placeholder="190" />
+          </div>
+          <div>
+            <label class="form-label">Tracțiune</label>
+            <select name="drivetrain" class="form-select">
+              <option value="">Nespecificat</option>
+              <option>FWD (față)</option>
+              <option>RWD (spate)</option>
+              <option>4x4 / AWD</option>
+            </select>
+          </div>
+          <div>
+            <label class="form-label">Nr. uși</label>
+            <select name="doors" class="form-select">
+              <option value="0">Nespecificat</option>
+              <option value="2">2</option>
+              <option value="3">3</option>
+              <option value="4">4</option>
+              <option value="5">5</option>
+            </select>
+          </div>
+          <div>
+            <label class="form-label">Nr. locuri</label>
+            <input type="number" name="seats" class="form-input" min="2" max="9" placeholder="5" />
+          </div>
+          <div>
+            <label class="form-label">Normă Euro</label>
+            <select name="euro_standard" class="form-select">
+              <option value="">Nespecificat</option>
+              <option>Euro 3</option>
+              <option>Euro 4</option>
+              <option>Euro 5</option>
+              <option>Euro 6</option>
+              <option>Euro 6d</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <div class="bg-white rounded-xl shadow-sm p-6 space-y-4">
+        <h2 class="font-semibold text-gray-700 border-b pb-2">Istoric & Proveniență</h2>
+        <div class="grid sm:grid-cols-2 gap-4">
+          <div>
+            <label class="form-label">VIN (opțional)</label>
+            <input type="text" name="vin" class="form-input" placeholder="WVWZZZ1KZ..." maxlength="17" />
+          </div>
+          <div>
+            <label class="form-label">Țara de origine</label>
+            <input type="text" name="country_origin" class="form-input" placeholder="Germania" />
+          </div>
+          <div>
+            <label class="form-label">Nr. proprietari anteriori</label>
+            <input type="number" name="nr_owners" class="form-input" min="0" max="20" placeholder="1" />
+          </div>
+          <div class="flex flex-col gap-3 mt-6">
+            <label class="flex items-center gap-3 cursor-pointer">
+              <input type="checkbox" name="service_history" value="1" class="w-4 h-4 accent-orange-500" />
+              <span class="form-label mb-0">Istoric service disponibil</span>
+            </label>
+            <label class="flex items-center gap-3 cursor-pointer">
+              <input type="checkbox" name="accident_free" value="0" class="w-4 h-4 accent-red-500" />
+              <span class="form-label mb-0 text-red-600">Are accident în istoric</span>
+            </label>
           </div>
         </div>
       </div>

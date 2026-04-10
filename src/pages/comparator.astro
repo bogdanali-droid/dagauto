@@ -1,0 +1,166 @@
+---
+import Layout from '../layouts/Layout.astro';
+import { getCarBySlug, getCarImages } from '../lib/db';
+
+const params = Astro.url.searchParams;
+const slugsParam = params.get('ids') || '';
+const slugs = slugsParam.split(',').filter(Boolean).slice(0, 3);
+
+let cars: any[] = [];
+try {
+  const DB = Astro.locals.runtime?.env?.DB;
+  if (DB && slugs.length > 0) {
+    const results = await Promise.all(
+      slugs.map(async slug => {
+        const car = await getCarBySlug(DB, slug);
+        if (!car) return null;
+        const images = await getCarImages(DB, car.id);
+        const primary = images.results.find((i: any) => i.is_primary) || images.results[0];
+        return { ...car, primary_image: primary?.image_url };
+      })
+    );
+    cars = results.filter(Boolean);
+  }
+} catch {}
+
+const specLabels = [
+  { key: 'year', label: 'An fabricație' },
+  { key: 'mileage', label: 'Kilometraj', format: (v: any) => `${new Intl.NumberFormat('ro-RO').format(v)} km` },
+  { key: 'fuel_type', label: 'Combustibil' },
+  { key: 'transmission', label: 'Transmisie' },
+  { key: 'body_type', label: 'Caroserie' },
+  { key: 'engine_size', label: 'Motor' },
+  { key: 'power', label: 'Putere', format: (v: any) => v ? `${v} CP` : '-' },
+  { key: 'color', label: 'Culoare' },
+  { key: 'drivetrain', label: 'Tracțiune' },
+  { key: 'doors', label: 'Nr. uși', format: (v: any) => v || '-' },
+  { key: 'seats', label: 'Nr. locuri', format: (v: any) => v || '-' },
+  { key: 'euro_standard', label: 'Normă Euro' },
+  { key: 'accident_free', label: 'Fără accident', format: (v: any) => v !== 0 ? '✓ Da' : '✗ Nu' },
+  { key: 'service_history', label: 'Istoric service', format: (v: any) => v === 1 ? '✓ Da' : '✗ Nu' },
+  { key: 'nr_owners', label: 'Proprietari anteriori', format: (v: any) => v || '-' },
+  { key: 'country_origin', label: 'Țara origine' },
+];
+---
+
+<Layout
+  title="Comparator Mașini — DAG Auto Buzău"
+  description="Compară mașini second hand side-by-side. Vezi specificațiile, prețurile și dotările în detaliu."
+>
+  <section class="py-10 text-white" style="background-color: #0f2244;">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <nav class="text-sm text-gray-400 mb-3 flex items-center gap-2">
+        <a href="/" class="hover:text-orange-400">Acasă</a>
+        <span>/</span>
+        <a href="/parc-auto" class="hover:text-orange-400">Parc Auto</a>
+        <span>/</span>
+        <span class="text-gray-200">Comparator</span>
+      </nav>
+      <h1 class="text-3xl font-extrabold">Comparator Mașini</h1>
+      <p class="text-gray-300 mt-1">Compară până la 3 mașini side-by-side</p>
+    </div>
+  </section>
+
+  <section class="py-10 bg-gray-50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      {cars.length === 0 ? (
+        <div class="text-center py-20 bg-white rounded-xl shadow-sm">
+          <p class="text-5xl mb-4">⚖️</p>
+          <h2 class="text-xl font-bold text-gray-700 mb-2">Nicio mașină selectată</h2>
+          <p class="text-gray-500 mb-6">Adaugă mașini la comparator din pagina parcului auto (iconița grafic de pe card).</p>
+          <a href="/parc-auto" class="btn-primary">Mergi la Parc Auto →</a>
+        </div>
+      ) : (
+        <div class="overflow-x-auto">
+          <table class="w-full bg-white rounded-xl shadow-md overflow-hidden">
+            <!-- Header: car photos + titles + prices -->
+            <thead>
+              <tr class="border-b border-gray-100">
+                <th class="p-4 text-left text-sm font-medium text-gray-500 w-40">Specificație</th>
+                {cars.map(car => (
+                  <th class="p-4 text-center align-top">
+                    <a href={`/parc-auto/${car.slug}`} class="block hover:opacity-90 transition-opacity">
+                      {car.primary_image ? (
+                        <img src={car.primary_image} alt={car.title}
+                          class="w-full h-32 object-cover rounded-lg mb-3" />
+                      ) : (
+                        <div class="w-full h-32 bg-gray-100 rounded-lg mb-3 flex items-center justify-center text-gray-400">🚗</div>
+                      )}
+                      <div class="font-bold text-gray-900 text-sm leading-tight line-clamp-2 mb-1">{car.title}</div>
+                      <div class="text-xl font-extrabold text-orange-500">
+                        {new Intl.NumberFormat('ro-RO').format(car.price)} €
+                      </div>
+                      <div class="text-xs text-gray-400 mt-1">
+                        de la {new Intl.NumberFormat('ro-RO').format(Math.round(car.price * 0.8 * (0.085/12 * Math.pow(1+0.085/12,48)) / (Math.pow(1+0.085/12,48)-1)))} €/lună
+                      </div>
+                    </a>
+                    <div class="flex flex-col gap-2 mt-3">
+                      <a href={`/parc-auto/${car.slug}`} class="btn-primary text-xs py-2 block">
+                        Vezi detalii
+                      </a>
+                      <a href={`https://wa.me/40721586534?text=${encodeURIComponent(`Bună! Sunt interesat de ${car.title} (${car.price} €). Detalii?`)}`}
+                        target="_blank" rel="noopener"
+                        class="block text-center text-xs py-2 bg-green-50 hover:bg-green-100 text-green-700 font-semibold rounded-lg border border-green-200 transition-colors">
+                        WhatsApp
+                      </a>
+                    </div>
+                  </th>
+                ))}
+                {cars.length < 3 && (
+                  <th class="p-4 text-center">
+                    <a href="/parc-auto" class="block border-2 border-dashed border-gray-200 rounded-xl p-8 hover:border-orange-300 transition-colors text-gray-400 hover:text-orange-400">
+                      <div class="text-4xl mb-2">+</div>
+                      <div class="text-sm">Adaugă mașină</div>
+                    </a>
+                  </th>
+                )}
+              </tr>
+            </thead>
+
+            <!-- Specs rows -->
+            <tbody>
+              {specLabels.map((spec, idx) => {
+                const values = cars.map(car => {
+                  const raw = car[spec.key];
+                  return spec.format ? spec.format(raw) : (raw || '-');
+                });
+                const allSame = values.every(v => v === values[0]);
+                return (
+                  <tr class={idx % 2 === 0 ? 'bg-gray-50' : 'bg-white'}>
+                    <td class="p-4 text-sm font-medium text-gray-600">{spec.label}</td>
+                    {values.map((val, i) => (
+                      <td class={`p-4 text-center text-sm ${!allSame && cars.length > 1 ? 'font-semibold' : ''} ${val && val.toString().startsWith('✓') ? 'text-green-600' : val && val.toString().startsWith('✗') ? 'text-red-500' : 'text-gray-800'}`}>
+                        {val || '-'}
+                      </td>
+                    ))}
+                    {cars.length < 3 && <td class="p-4" />}
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
+      )}
+
+      <div class="mt-8 text-center">
+        <a href="/parc-auto" class="btn-outline">← Înapoi la Parc Auto</a>
+      </div>
+    </div>
+  </section>
+</Layout>
+
+<script>
+  // Sync compare bar from localStorage when navigating directly to this page
+  const urlParams = new URLSearchParams(window.location.search);
+  const ids = urlParams.get('ids');
+  if (!ids) {
+    // Load from localStorage and redirect
+    try {
+      const stored = JSON.parse(localStorage.getItem('dagauto_compare') || '[]');
+      if (stored.length > 0) {
+        const slugs = stored.map((i: any) => i.slug).join(',');
+        window.location.href = `/comparator?ids=${slugs}`;
+      }
+    } catch {}
+  }
+</script>

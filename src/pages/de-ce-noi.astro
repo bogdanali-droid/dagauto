@@ -1,0 +1,135 @@
+---
+import Layout from '../layouts/Layout.astro';
+---
+
+<Layout
+  title="De ce DAG Auto? — Garantii si Avantaje"
+  description="Află de ce mii de clienți aleg DAG Auto Buzău. Garanție 12 luni, verificare tehnică, finanțare rapidă, istoric transparent și suport complet."
+>
+  <!-- Hero -->
+  <section class="py-16 text-white" style="background-color: #0f2244;">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+      <div class="text-5xl mb-4">🏆</div>
+      <h1 class="text-4xl md:text-5xl font-extrabold mb-4">De ce DAG Auto?</h1>
+      <p class="text-xl text-gray-300 max-w-2xl mx-auto">
+        Peste 10 ani de experiență și 500+ mașini vândute ne-au învățat că cel mai important lucru este încrederea ta.
+      </p>
+    </div>
+  </section>
+
+  <!-- Stats -->
+  <section class="bg-orange-500 py-10">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-6 text-center text-white">
+        {[
+          { num: '10+', label: 'Ani de experiență' },
+          { num: '500+', label: 'Mașini vândute' },
+          { num: '98%', label: 'Clienți mulțumiți' },
+          { num: '24h', label: 'Aprobare finanțare' },
+        ].map(s => (
+          <div>
+            <div class="text-3xl md:text-4xl font-extrabold">{s.num}</div>
+            <div class="text-orange-100 text-sm mt-1">{s.label}</div>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- Garantii principale -->
+  <section class="py-16 bg-white">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <h2 class="text-3xl font-extrabold text-center mb-12" style="color: #0f2244;">Garanțiile noastre</h2>
+      <div class="grid md:grid-cols-3 gap-8">
+        {[
+          {
+            icon: '🛡️',
+            title: 'Garanție 12 luni',
+            desc: 'Fiecare mașină din parcul nostru vine cu garanție 12 luni pe motor și cutie de viteze. Fără excepții, fără condiții ascunse.',
+            color: 'green',
+          },
+          {
+            icon: '🔍',
+            title: 'Verificare tehnică completă',
+            desc: 'Înainte de a intra în parc, fiecare mașină trece printr-o inspecție tehnică riguroasă în service-ul nostru autorizat.',
+            color: 'blue',
+          },
+          {
+            icon: '📋',
+            title: 'Istoric 100% transparent',
+            desc: 'Ai acces la raportul carVertical pentru fiecare mașină — kilometraj real, accidente, proveniență, verificare furturi.',
+            color: 'purple',
+          },
+          {
+            icon: '💳',
+            title: 'Finanțare în 24 ore',
+            desc: 'Colaborăm cu principalele bănci din România. Aprobare în maximum 24 ore, avans de la 10%, rate fixe pe toată perioada.',
+            color: 'orange',
+          },
+          {
+            icon: '🏎️',
+            title: 'Test drive gratuit',
+            desc: 'Vino și testează orice mașină din parc fără niciun angajament. Programarea durează 1 minut prin WhatsApp sau telefon.',
+            color: 'red',
+          },
+          {
+            icon: '🚚',
+            title: 'Livrare oriunde în țară',
+            desc: 'Nu poți veni la showroom? Livrăm mașina la ușa ta, oriunde în România. Costul livrării se negociază în funcție de distanță.',
+            color: 'teal',
+          },
+        ].map(g => (
+          <div class="bg-gray-50 rounded-2xl p-8 border border-gray-100 hover:shadow-md transition-shadow">
+            <div class="text-4xl mb-4">{g.icon}</div>
+            <h3 class="text-xl font-bold text-gray-900 mb-3">{g.title}</h3>
+            <p class="text-gray-600 leading-relaxed">{g.desc}</p>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- Procesul de cumparare -->
+  <section class="py-16 bg-gray-50">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+      <h2 class="text-3xl font-extrabold text-center mb-12" style="color: #0f2244;">Cum funcționează?</h2>
+      <div class="space-y-6">
+        {[
+          { step: '01', title: 'Alegi mașina', desc: 'Navighezi parcul auto online sau vizitezi showroom-ul din Buzău. Poți solicita și o comandă specială dacă nu găsești ce cauți.' },
+          { step: '02', title: 'Test drive & verificare', desc: 'Programezi un test drive gratuit. Poți verifica mașina și cu un mecanic de încredere — nu avem nimic de ascuns.' },
+          { step: '03', title: 'Finanțare (opțional)', desc: 'Dacă ai nevoie de rate, completezi cererea de finanțare. Aprobarea vine în maximum 24 de ore, cu documentație minimă.' },
+          { step: '04', title: 'Preiei mașina', desc: 'Semnezi contractul, primești factura și pleci cu mașina ta. Dacă nu poți veni, o livrăm noi la tine.' },
+        ].map(s => (
+          <div class="flex gap-6 items-start bg-white rounded-2xl p-6 shadow-sm">
+            <div class="text-3xl font-extrabold text-orange-500 shrink-0 w-12">{s.step}</div>
+            <div>
+              <h3 class="text-lg font-bold text-gray-900 mb-1">{s.title}</h3>
+              <p class="text-gray-600">{s.desc}</p>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section class="py-16 text-white text-center" style="background-color: #0f2244;">
+    <div class="max-w-2xl mx-auto px-4">
+      <h2 class="text-3xl font-extrabold mb-4">Convins? Hai să găsim mașina ta!</h2>
+      <p class="text-gray-300 mb-8 text-lg">Browsează parcul auto sau contactează-ne direct — suntem la un mesaj distanță.</p>
+      <div class="flex flex-wrap justify-center gap-4">
+        <a href="/parc-auto" class="btn-primary text-lg px-8 py-4">Caută mașina ta →</a>
+        <a
+          href="https://wa.me/40721586534?text=Bun%C4%83%20ziua!%20Am%20câteva%20întrebări%20despre%20mașinile%20din%20parc."
+          target="_blank" rel="noopener"
+          class="flex items-center gap-2 bg-green-500 hover:bg-green-600 text-white font-semibold px-8 py-4 rounded-xl transition-colors text-lg"
+        >
+          <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+            <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
+          </svg>
+          WhatsApp
+        </a>
+      </div>
+    </div>
+  </section>
+</Layout>

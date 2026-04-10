@@ -14,6 +14,11 @@ const filters = {
   max_price: params.get('max_price') ? Number(params.get('max_price')) : undefined,
   min_year: params.get('min_year') ? Number(params.get('min_year')) : undefined,
   max_year: params.get('max_year') ? Number(params.get('max_year')) : undefined,
+  min_power: params.get('min_power') ? Number(params.get('min_power')) : undefined,
+  max_power: params.get('max_power') ? Number(params.get('max_power')) : undefined,
+  drivetrain: params.get('drivetrain') || undefined,
+  accident_free: params.get('accident_free') === '1' ? true : undefined,
+  sort: params.get('sort') || undefined,
 };
 
 const page = Number(params.get('page') || 1);
@@ -21,6 +26,7 @@ const perPage = 12;
 
 let cars: any[] = [];
 let makes: string[] = [];
+let totalCount = 0;
 try {
   const DB = Astro.locals.runtime?.env?.DB;
   if (DB) {
@@ -30,6 +36,9 @@ try {
     ]);
     cars = carsResult.results;
     makes = makesResult.results.map((r: any) => r.make);
+    // Count total for pagination
+    const countResult = await getCars(DB, { ...filters, limit: 1000 });
+    totalCount = countResult.results.length;
   }
 } catch (e) { console.error('DB error parc-auto:', e); }
 
@@ -42,9 +51,29 @@ const currentFilters = {
   max_price: params.get('max_price') || undefined,
   min_year: params.get('min_year') || undefined,
   max_year: params.get('max_year') || undefined,
+  min_power: params.get('min_power') || undefined,
+  max_power: params.get('max_power') || undefined,
+  drivetrain: params.get('drivetrain') || undefined,
+  accident_free: params.get('accident_free') || undefined,
+  sort: params.get('sort') || undefined,
 };
 
-const hasFilters = Object.values(currentFilters).some(Boolean);
+const filterLabels: Record<string, string> = {
+  make: 'Marcă', fuel_type: 'Combustibil', transmission: 'Transmisie',
+  body_type: 'Caroserie', min_price: 'Preț min', max_price: 'Preț max',
+  min_year: 'An min', max_year: 'An max', min_power: 'CP min', max_power: 'CP max',
+  drivetrain: 'Tracțiune', accident_free: 'Fără accident',
+};
+
+const hasFilters = Object.entries(currentFilters).filter(([k, v]) => v && k !== 'sort').length > 0;
+const hasPrevPage = page > 1;
+const hasNextPage = cars.length === perPage;
+
+function buildUrl(extra: Record<string, string | undefined>) {
+  const p = new URLSearchParams();
+  Object.entries({ ...currentFilters, ...extra }).forEach(([k, v]) => { if (v) p.set(k, v); });
+  return `/parc-auto?${p.toString()}`;
+}
 ---
 
 <Layout
@@ -55,7 +84,7 @@ const hasFilters = Object.values(currentFilters).some(Boolean);
   <section class="bg-navy-900 text-white py-10" style="background-color: #0f2244;">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <h1 class="text-3xl md:text-4xl font-extrabold mb-2">Parc Auto DAG</h1>
-      <p class="text-gray-300">Mașini second hand verificate în Buzău</p>
+      <p class="text-gray-300">Mașini second hand verificate în Buzău — garanție 12 luni pe fiecare mașină</p>
     </div>
   </section>
 
@@ -65,15 +94,23 @@ const hasFilters = Object.values(currentFilters).some(Boolean);
         <!-- Sidebar Filters -->
         <aside class="lg:w-72 shrink-0">
           <CarFilters makes={makes} currentFilters={currentFilters} />
+
+          <!-- Masini vazute recent -->
+          <div class="mt-6 bg-white rounded-xl shadow-md p-5" id="recent-block" style="display:none">
+            <h3 class="font-bold text-sm mb-3" style="color:#0f2244;">Recent vizualizate</h3>
+            <div id="recent-list" class="space-y-2"></div>
+          </div>
         </aside>
 
         <!-- Cars Grid -->
         <div class="flex-1">
           {hasFilters && (
-            <div class="mb-4 flex items-center gap-2 text-sm text-gray-600">
-              <span>Filtre active:</span>
-              {Object.entries(currentFilters).filter(([,v]) => v).map(([k, v]) => (
-                <span class="bg-orange-100 text-orange-700 px-2 py-1 rounded-full">{v}</span>
+            <div class="mb-4 flex items-center gap-2 text-sm text-gray-600 flex-wrap">
+              <span class="font-medium">Filtre active:</span>
+              {Object.entries(currentFilters).filter(([k, v]) => v && k !== 'sort').map(([k, v]) => (
+                <span class="bg-orange-100 text-orange-700 px-2 py-1 rounded-full">
+                  {filterLabels[k] || k}: {k === 'accident_free' ? 'Da' : v}
+                </span>
               ))}
               <a href="/parc-auto" class="text-red-500 hover:underline ml-2">✕ Șterge toate</a>
             </div>
@@ -81,20 +118,22 @@ const hasFilters = Object.values(currentFilters).some(Boolean);
 
           {cars.length > 0 ? (
             <>
-              <p class="text-sm text-gray-500 mb-4">{cars.length} mașini găsite</p>
+              <p class="text-sm text-gray-500 mb-4">
+                {totalCount} mașin{totalCount === 1 ? 'ă' : 'i'} găsite · Pagina {page}
+              </p>
               <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-5">
                 {cars.map(car => <CarCard {...car} />)}
               </div>
-              {cars.length === perPage && (
-                <div class="text-center mt-8">
-                  <a
-                    href={`/parc-auto?${new URLSearchParams({ ...Object.fromEntries(Object.entries(currentFilters).filter(([,v]) => Boolean(v))), page: String(page + 1) })}`}
-                    class="btn-secondary"
-                  >
-                    Pagina Următoare →
-                  </a>
-                </div>
-              )}
+
+              <!-- Pagination -->
+              <div class="flex justify-center gap-4 mt-8">
+                {hasPrevPage && (
+                  <a href={buildUrl({ page: String(page - 1) })} class="btn-outline">← Pagina anterioară</a>
+                )}
+                {hasNextPage && (
+                  <a href={buildUrl({ page: String(page + 1) })} class="btn-secondary">Pagina următoare →</a>
+                )}
+              </div>
             </>
           ) : (
             <div class="text-center py-16 bg-white rounded-xl shadow-sm">
@@ -111,4 +150,84 @@ const hasFilters = Object.values(currentFilters).some(Boolean);
       </div>
     </div>
   </section>
+
+  <!-- Comparator bar (sticky bottom) -->
+  <div id="compare-bar" class="fixed bottom-0 left-0 right-0 z-40 bg-white border-t border-gray-200 shadow-2xl p-4 hidden">
+    <div class="max-w-7xl mx-auto flex items-center justify-between gap-4">
+      <div class="flex items-center gap-3">
+        <span class="font-bold text-gray-800">Comparator:</span>
+        <div id="compare-items" class="flex gap-2 flex-wrap"></div>
+      </div>
+      <div class="flex items-center gap-3 shrink-0">
+        <button id="clear-compare" class="text-sm text-red-500 hover:underline">Golește</button>
+        <a id="compare-link" href="/comparator" class="btn-primary text-sm">Compară →</a>
+      </div>
+    </div>
+  </div>
 </Layout>
+
+<script>
+  // Recently viewed
+  function getRecent(): {id: number, title: string, slug: string}[] {
+    try { return JSON.parse(localStorage.getItem('dagauto_recent') || '[]'); } catch { return []; }
+  }
+
+  const recentBlock = document.getElementById('recent-block');
+  const recentList = document.getElementById('recent-list');
+  const recent = getRecent();
+  if (recent.length > 0 && recentBlock && recentList) {
+    recentBlock.style.display = 'block';
+    recent.slice(0, 5).forEach(car => {
+      const a = document.createElement('a');
+      a.href = `/parc-auto/${car.slug}`;
+      a.className = 'block text-sm text-gray-700 hover:text-orange-500 truncate py-1 border-b border-gray-50 last:border-0';
+      a.textContent = car.title;
+      recentList.appendChild(a);
+    });
+  }
+
+  // Comparator bar
+  function getCompare(): {id: number, title: string, slug: string}[] {
+    try { return JSON.parse(localStorage.getItem('dagauto_compare') || '[]'); } catch { return []; }
+  }
+
+  function updateCompareBar() {
+    const items = getCompare();
+    const bar = document.getElementById('compare-bar');
+    const itemsEl = document.getElementById('compare-items');
+    const link = document.getElementById('compare-link') as HTMLAnchorElement;
+
+    if (!bar || !itemsEl || !link) return;
+
+    if (items.length === 0) {
+      bar.classList.add('hidden');
+      return;
+    }
+    bar.classList.remove('hidden');
+    itemsEl.innerHTML = '';
+    items.forEach(item => {
+      const span = document.createElement('span');
+      span.className = 'bg-orange-100 text-orange-800 text-xs font-medium px-2 py-1 rounded-full flex items-center gap-1';
+      span.innerHTML = `${item.title} <button data-id="${item.id}" class="remove-compare ml-1 text-orange-500 hover:text-red-500 font-bold">×</button>`;
+      itemsEl.appendChild(span);
+    });
+    link.href = `/comparator?ids=${items.map(i => i.slug).join(',')}`;
+    // Re-attach remove listeners
+    itemsEl.querySelectorAll('.remove-compare').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        const id = Number((e.currentTarget as HTMLElement).dataset.id);
+        const current = getCompare().filter(i => i.id !== id);
+        localStorage.setItem('dagauto_compare', JSON.stringify(current));
+        window.dispatchEvent(new Event('compare-changed'));
+      });
+    });
+  }
+
+  updateCompareBar();
+  window.addEventListener('compare-changed', updateCompareBar);
+
+  document.getElementById('clear-compare')?.addEventListener('click', () => {
+    localStorage.setItem('dagauto_compare', '[]');
+    window.dispatchEvent(new Event('compare-changed'));
+  });
+</script>

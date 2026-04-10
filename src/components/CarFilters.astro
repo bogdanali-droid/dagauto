@@ -10,6 +10,11 @@ interface Props {
     max_price?: string;
     min_year?: string;
     max_year?: string;
+    min_power?: string;
+    max_power?: string;
+    drivetrain?: string;
+    accident_free?: string;
+    sort?: string;
   };
 }
 
@@ -18,12 +23,30 @@ const { makes, currentFilters } = Astro.props;
 const fuelTypes = ['Benzină', 'Diesel', 'Hibrid', 'Electric', 'GPL'];
 const transmissions = ['Manuală', 'Automată'];
 const bodyTypes = ['Berlină', 'Break', 'SUV', 'Hatchback', 'Coupe', 'Cabrio', 'Monovolum', 'Pickup'];
+const drivetrains = ['FWD (față)', 'RWD (spate)', '4x4 / AWD'];
+const sortOptions = [
+  { value: 'newest', label: 'Cele mai noi' },
+  { value: 'price_asc', label: 'Preț crescător' },
+  { value: 'price_desc', label: 'Preț descrescător' },
+  { value: 'year_desc', label: 'An fabricație (nou → vechi)' },
+  { value: 'mileage_asc', label: 'Kilometraj (mic → mare)' },
+];
 ---
 
 <form method="GET" action="/parc-auto" class="bg-white rounded-xl shadow-md p-6">
-  <h2 class="text-lg font-bold text-navy-800 mb-5" style="color: #0f2244;">Filtrează Mașini</h2>
+  <h2 class="text-lg font-bold mb-5" style="color: #0f2244;">Filtrează Mașini</h2>
 
   <div class="space-y-4">
+    <!-- Sort -->
+    <div>
+      <label class="form-label">Sortare</label>
+      <select name="sort" class="form-select">
+        {sortOptions.map(o => (
+          <option value={o.value} selected={currentFilters.sort === o.value}>{o.label}</option>
+        ))}
+      </select>
+    </div>
+
     <!-- Make -->
     <div>
       <label class="form-label">Marcă</label>
@@ -68,6 +91,17 @@ const bodyTypes = ['Berlină', 'Break', 'SUV', 'Hatchback', 'Coupe', 'Cabrio', '
       </select>
     </div>
 
+    <!-- Drivetrain -->
+    <div>
+      <label class="form-label">Tracțiune</label>
+      <select name="drivetrain" class="form-select">
+        <option value="">Toate</option>
+        {drivetrains.map(d => (
+          <option value={d} selected={currentFilters.drivetrain === d}>{d}</option>
+        ))}
+      </select>
+    </div>
+
     <!-- Price range -->
     <div>
       <label class="form-label">Preț (€)</label>
@@ -81,9 +115,33 @@ const bodyTypes = ['Berlină', 'Break', 'SUV', 'Hatchback', 'Coupe', 'Cabrio', '
     <div>
       <label class="form-label">An fabricație</label>
       <div class="flex gap-2">
-        <input type="number" name="min_year" placeholder="De la" value={currentFilters.min_year} class="form-input" min="2000" max="2024" />
-        <input type="number" name="max_year" placeholder="Până la" value={currentFilters.max_year} class="form-input" min="2000" max="2024" />
+        <input type="number" name="min_year" placeholder="De la" value={currentFilters.min_year} class="form-input" min="2000" max="2025" />
+        <input type="number" name="max_year" placeholder="Până la" value={currentFilters.max_year} class="form-input" min="2000" max="2025" />
       </div>
+    </div>
+
+    <!-- Power range -->
+    <div>
+      <label class="form-label">Putere (CP)</label>
+      <div class="flex gap-2">
+        <input type="number" name="min_power" placeholder="Min" value={currentFilters.min_power} class="form-input" min="0" step="10" />
+        <input type="number" name="max_power" placeholder="Max" value={currentFilters.max_power} class="form-input" min="0" step="10" />
+      </div>
+    </div>
+
+    <!-- Accident free -->
+    <div class="flex items-center gap-3 py-2 border-t border-gray-100 pt-4">
+      <input
+        type="checkbox"
+        name="accident_free"
+        id="accident_free"
+        value="1"
+        checked={currentFilters.accident_free === '1'}
+        class="w-4 h-4 accent-orange-500"
+      />
+      <label for="accident_free" class="text-sm font-medium text-gray-700 cursor-pointer">
+        Fără accident în istoric
+      </label>
     </div>
 
     <button type="submit" class="btn-primary w-full">Aplică Filtre</button>

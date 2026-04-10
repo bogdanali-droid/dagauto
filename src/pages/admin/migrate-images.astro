@@ -1,0 +1,159 @@
+---
+import AdminLayout from '../../layouts/AdminLayout.astro';
+---
+
+<AdminLayout title="Migrare Poze WP → R2">
+  <div class="max-w-2xl mx-auto py-8 px-4">
+    <h1 class="text-2xl font-bold text-gray-800 mb-2">Migrare Poze WordPress → R2</h1>
+    <p class="text-gray-500 mb-6">Browserul tău descarcă fiecare poză de pe dagauto.ro și o urcă în R2. Lasă pagina deschisă până termină.</p>
+
+    <button
+      id="start-btn"
+      class="w-full bg-orange-500 hover:bg-orange-600 text-white font-bold py-4 rounded-xl text-lg transition-colors"
+    >
+      ▶ Pornește migrarea
+    </button>
+
+    <div id="progress-bar-wrap" class="hidden mt-6">
+      <div class="flex justify-between text-sm text-gray-500 mb-1">
+        <span id="progress-label">0 / 0</span>
+        <span id="progress-pct">0%</span>
+      </div>
+      <div class="w-full bg-gray-200 rounded-full h-4">
+        <div id="progress-bar" class="bg-orange-500 h-4 rounded-full transition-all" style="width:0%"></div>
+      </div>
+    </div>
+
+    <div id="status" class="hidden mt-4 p-4 rounded-xl text-sm font-medium"></div>
+
+    <div id="log" class="hidden mt-4 max-h-64 overflow-y-auto bg-gray-900 text-green-400 text-xs p-4 rounded-xl font-mono space-y-1"></div>
+
+    <div id="summary" class="hidden mt-6"></div>
+  </div>
+
+  <script>
+    const startBtn = document.getElementById('start-btn') as HTMLButtonElement;
+    const progressWrap = document.getElementById('progress-bar-wrap')!;
+    const progressBar = document.getElementById('progress-bar')!;
+    const progressLabel = document.getElementById('progress-label')!;
+    const progressPct = document.getElementById('progress-pct')!;
+    const statusEl = document.getElementById('status')!;
+    const logEl = document.getElementById('log')!;
+    const summaryEl = document.getElementById('summary')!;
+
+    function log(msg: string) {
+      const line = document.createElement('div');
+      line.textContent = msg;
+      logEl.appendChild(line);
+      logEl.scrollTop = logEl.scrollHeight;
+    }
+
+    function setStatus(msg: string, color: string) {
+      statusEl.className = `mt-4 p-4 rounded-xl text-sm font-medium ${color}`;
+      statusEl.textContent = msg;
+      statusEl.classList.remove('hidden');
+    }
+
+    startBtn.addEventListener('click', async () => {
+      startBtn.disabled = true;
+      startBtn.textContent = 'Se rulează...';
+      progressWrap.classList.remove('hidden');
+      logEl.classList.remove('hidden');
+      logEl.innerHTML = '';
+
+      setStatus('Se încarcă lista de imagini...', 'bg-blue-50 text-blue-700');
+
+      // Step 1: get list of WP images from API
+      let images: any[] = [];
+      try {
+        const res = await fetch('/api/migrate-list?key=migrate2024dagauto');
+        const data = await res.json();
+        images = data.images || [];
+      } catch (err) {
+        setStatus(`Eroare la încărcarea listei: ${err}`, 'bg-red-50 text-red-700');
+        startBtn.disabled = false;
+        startBtn.textContent = '▶ Pornește migrarea';
+        return;
+      }
+
+      log(`📋 ${images.length} imagini de migrat`);
+
+      let ok = 0, failed = 0, skip = 0;
+      const total = images.length;
+
+      for (let i = 0; i < images.length; i++) {
+        const img = images[i];
+        const pct = Math.round(((i + 1) / total) * 100);
+        progressBar.style.width = pct + '%';
+        progressLabel.textContent = `${i + 1} / ${total}`;
+        progressPct.textContent = pct + '%';
+        setStatus(`Se procesează: ${img.filename}`, 'bg-blue-50 text-blue-700');
+
+        try {
+          // Fetch image in browser
+          const imgRes = await fetch(img.url, { mode: 'cors' });
+          if (!imgRes.ok) {
+            log(`❌ ${img.filename} — fetch_failed_${imgRes.status}`);
+            failed++;
+            continue;
+          }
+
+          const blob = await imgRes.blob();
+          const formData = new FormData();
+          formData.append('id', String(img.id));
+          formData.append('car_id', String(img.car_id));
+          formData.append('filename', img.filename);
+          formData.append('image', blob, img.filename);
+
+          const uploadRes = await fetch('/api/migrate-upload', {
+            method: 'POST',
+            body: formData
+          });
+
+          if (uploadRes.ok) {
+            log(`✅ ${img.filename}`);
+            ok++;
+          } else {
+            const err = await uploadRes.text();
+            log(`❌ ${img.filename} — upload error: ${err}`);
+            failed++;
+          }
+        } catch (err: any) {
+          log(`❌ ${img.filename} — ${err.message}`);
+          failed++;
+        }
+      }
+
+      // Done
+      progressBar.style.width = '100%';
+      summaryEl.classList.remove('hidden');
+      summaryEl.innerHTML = `
+        <div class="rounded-xl p-5 ${ok > 0 ? 'bg-green-50 border border-green-200' : 'bg-yellow-50 border border-yellow-200'}">
+          <div class="text-xl font-bold mb-3 ${ok > 0 ? 'text-green-700' : 'text-yellow-700'}">
+            ${ok === total ? '✅ Migrare completă!' : '⚠️ Migrare parțială'}
+          </div>
+          <div class="grid grid-cols-3 gap-4 text-center">
+            <div class="bg-white rounded-lg p-3">
+              <div class="text-2xl font-black text-green-600">${ok}</div>
+              <div class="text-sm text-gray-500">Migrate</div>
+            </div>
+            <div class="bg-white rounded-lg p-3">
+              <div class="text-2xl font-black text-red-600">${failed}</div>
+              <div class="text-sm text-gray-500">Eșuate</div>
+            </div>
+            <div class="bg-white rounded-lg p-3">
+              <div class="text-2xl font-black text-gray-400">${total}</div>
+              <div class="text-sm text-gray-500">Total</div>
+            </div>
+          </div>
+          ${ok > 0 ? '<p class="text-sm text-green-600 mt-3 font-semibold">Pozele ar trebui să apară acum pe site! 🎉</p>' : ''}
+          ${failed > 0 ? '<p class="text-sm text-red-600 mt-3">Imaginile eșuate nu au putut fi descărcate de pe dagauto.ro. Verifică consola browserului pentru detalii.</p>' : ''}
+        </div>
+      `;
+      setStatus('', '');
+      statusEl.classList.add('hidden');
+      startBtn.textContent = ok === total ? '✅ Gata!' : '🔄 Rulează din nou';
+      startBtn.disabled = false;
+    });
+  </script>
+</AdminLayout>

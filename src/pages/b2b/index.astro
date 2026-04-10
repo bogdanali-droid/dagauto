@@ -1,0 +1,126 @@
+---
+import B2BLayout from '../../layouts/B2BLayout.astro';
+---
+
+<B2BLayout title="Vinde-ți mașina prin DAG Auto">
+  <!-- Hero -->
+  <section style="background: linear-gradient(135deg, #0f2244 0%, #1a3a6b 100%);" class="text-white py-20">
+    <div class="max-w-4xl mx-auto px-4 text-center">
+      <div class="inline-block bg-orange-500 text-white text-sm font-bold px-4 py-1 rounded-full mb-6">Platformă B2B</div>
+      <h1 class="text-4xl md:text-5xl font-extrabold mb-6 leading-tight">
+        Vinde-ți mașina<br/>prin rețeaua DAG Auto
+      </h1>
+      <p class="text-xl text-gray-300 mb-10 max-w-2xl mx-auto">
+        Listează-ți mașina pe site-ul nostru, noi ne ocupăm de promovare și vânzare. Tu stabilești prețul, noi adăugăm comisionul de <strong class="text-orange-400">15%</strong>.
+      </p>
+      <div class="flex flex-col sm:flex-row gap-4 justify-center">
+        <a href="/b2b/register" class="bg-orange-500 hover:bg-orange-600 text-white font-bold px-8 py-4 rounded-xl text-lg transition-colors">
+          Creează cont gratuit →
+        </a>
+        <a href="/b2b/login" class="border-2 border-white/30 hover:border-white text-white font-bold px-8 py-4 rounded-xl text-lg transition-colors">
+          Am deja cont
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Cum funcționează -->
+  <section class="py-16 bg-white">
+    <div class="max-w-5xl mx-auto px-4">
+      <h2 class="text-3xl font-extrabold text-center text-gray-800 mb-12">Cum funcționează?</h2>
+      <div class="grid md:grid-cols-3 gap-8">
+        {[
+          { step: '1', icon: '📝', title: 'Creezi cont', desc: 'Înregistrare gratuită cu date de contact. Contul este activat în maxim 24 ore.' },
+          { step: '2', icon: '🚗', title: 'Adaugi mașina', desc: 'Completezi detaliile mașinii și stabilești prețul tău. Noi adăugăm 15% comision automat.' },
+          { step: '3', icon: '💰', title: 'Primești banii', desc: 'La vânzare, primești prețul tău integral. Comisionul de 15% rămâne la DAG Auto.' },
+        ].map(item => (
+          <div class="text-center p-6 rounded-2xl bg-gray-50 border border-gray-100">
+            <div class="w-12 h-12 bg-orange-500 text-white font-black text-xl rounded-full flex items-center justify-center mx-auto mb-4">{item.step}</div>
+            <div class="text-4xl mb-3">{item.icon}</div>
+            <h3 class="text-xl font-bold text-gray-800 mb-2">{item.title}</h3>
+            <p class="text-gray-500">{item.desc}</p>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- Calculator comision -->
+  <section class="py-16 bg-gray-50">
+    <div class="max-w-lg mx-auto px-4">
+      <h2 class="text-3xl font-extrabold text-center text-gray-800 mb-4">Calculator comision</h2>
+      <p class="text-center text-gray-500 mb-8">Introdu prețul tău și vezi ce apare pe site</p>
+      <div class="bg-white rounded-2xl shadow-md p-8">
+        <label class="block text-sm font-semibold text-gray-700 mb-2">Prețul tău (€)</label>
+        <input
+          type="number"
+          id="calc-input"
+          class="w-full border border-gray-300 rounded-xl px-4 py-3 text-xl font-bold focus:outline-none focus:ring-2 focus:ring-orange-400"
+          placeholder="10000"
+        />
+        <div class="mt-6 p-5 bg-gray-50 rounded-xl space-y-3">
+          <div class="flex justify-between text-sm text-gray-500">
+            <span>Prețul tău</span>
+            <span id="calc-own" class="font-semibold text-gray-700">—</span>
+          </div>
+          <div class="flex justify-between text-sm text-gray-500">
+            <span>Comision DAG Auto (15%)</span>
+            <span id="calc-commission" class="font-semibold text-orange-500">—</span>
+          </div>
+          <div class="border-t pt-3 flex justify-between font-bold text-lg">
+            <span class="text-gray-800">Preț afișat pe site</span>
+            <span id="calc-final" class="text-green-600">—</span>
+          </div>
+        </div>
+        <a href="/b2b/register" class="mt-6 block text-center bg-orange-500 hover:bg-orange-600 text-white font-bold py-3 rounded-xl transition-colors">
+          Listează acum →
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Avantaje -->
+  <section class="py-16 bg-white">
+    <div class="max-w-4xl mx-auto px-4">
+      <h2 class="text-3xl font-extrabold text-center text-gray-800 mb-12">De ce DAG Auto B2B?</h2>
+      <div class="grid sm:grid-cols-2 gap-6">
+        {[
+          { icon: '🌐', title: 'Vizibilitate online', desc: 'Mașina ta apare pe dagauto.ro alături de toate celelalte mașini din parc' },
+          { icon: '📱', title: 'Promovare social media', desc: 'Promovăm pe Facebook și Instagram cu fotografii profesionale' },
+          { icon: '💳', title: 'Finanțare inclusă', desc: 'Clienții pot accesa finanțare BT, TBI sau MOGO direct de pe anunțul tău' },
+          { icon: '📊', title: 'Dashboard personal', desc: 'Urmărești statusul mașinii tale în timp real: activ, rezervat, vândut' },
+          { icon: '🤝', title: 'Fără costuri inițiale', desc: 'Înregistrarea și listarea sunt gratuite. Comisionul se aplică doar la vânzare' },
+          { icon: '⚡', title: 'Activare rapidă', desc: 'Contul tău este verificat și activat în maxim 24 de ore' },
+        ].map(item => (
+          <div class="flex gap-4 p-5 rounded-xl bg-gray-50 border border-gray-100">
+            <div class="text-3xl shrink-0">{item.icon}</div>
+            <div>
+              <div class="font-bold text-gray-800 mb-1">{item.title}</div>
+              <div class="text-sm text-gray-500">{item.desc}</div>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <script>
+    const input = document.getElementById('calc-input') as HTMLInputElement;
+    const calcOwn = document.getElementById('calc-own')!;
+    const calcCommission = document.getElementById('calc-commission')!;
+    const calcFinal = document.getElementById('calc-final')!;
+
+    input.addEventListener('input', () => {
+      const val = parseFloat(input.value) || 0;
+      if (val > 0) {
+        const commission = Math.round(val * 0.15);
+        const final = val + commission;
+        calcOwn.textContent = `${val.toLocaleString('ro-RO')} €`;
+        calcCommission.textContent = `+${commission.toLocaleString('ro-RO')} €`;
+        calcFinal.textContent = `${final.toLocaleString('ro-RO')} €`;
+      } else {
+        calcOwn.textContent = calcCommission.textContent = calcFinal.textContent = '—';
+      }
+    });
+  </script>
+</B2BLayout>

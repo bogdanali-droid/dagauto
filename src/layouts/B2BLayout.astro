@@ -1,0 +1,64 @@
+---
+import '../styles/global.css';
+import { getB2BUser } from '../lib/b2b-auth';
+
+interface Props {
+  title: string;
+}
+const { title } = Astro.props;
+const DB = Astro.locals.runtime?.env?.DB;
+const secret = Astro.locals.runtime?.env?.SESSION_SECRET || 'dev-secret-change-in-prod';
+const user = DB ? await getB2BUser(Astro.request, DB, secret) : null;
+const pathname = Astro.url.pathname;
+---
+
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>{title} | DAG Auto B2B</title>
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+</head>
+<body class="min-h-screen bg-gray-50" style="font-family: 'Inter', sans-serif;">
+
+  <header style="background:#0f2244;" class="text-white shadow-lg">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex items-center justify-between h-16">
+        <a href="/b2b" class="flex items-center gap-3">
+          <img src="/logo-white.svg" alt="DAG Auto" class="h-8" />
+          <span class="text-orange-400 font-bold text-sm border border-orange-400 px-2 py-0.5 rounded">B2B</span>
+        </a>
+        <nav class="flex items-center gap-6 text-sm font-semibold">
+          {user ? (
+            <>
+              <a href="/b2b/dashboard" class={`hover:text-orange-400 transition-colors ${pathname === '/b2b/dashboard' ? 'text-orange-400' : 'text-gray-200'}`}>Dashboard</a>
+              <a href="/b2b/add-car" class={`hover:text-orange-400 transition-colors ${pathname === '/b2b/add-car' ? 'text-orange-400' : 'text-gray-200'}`}>Adaugă Mașină</a>
+              <span class="text-gray-400">|</span>
+              <span class="text-gray-300 text-xs">{user.name}</span>
+              <a href="/b2b/logout" class="bg-orange-500 hover:bg-orange-600 text-white px-4 py-1.5 rounded-lg transition-colors">Ieși</a>
+            </>
+          ) : (
+            <>
+              <a href="/b2b/login" class="hover:text-orange-400 transition-colors">Autentificare</a>
+              <a href="/b2b/register" class="bg-orange-500 hover:bg-orange-600 text-white px-4 py-1.5 rounded-lg transition-colors">Înregistrare</a>
+            </>
+          )}
+        </nav>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <slot />
+  </main>
+
+  <footer class="mt-16 py-6 text-center text-sm text-gray-400 border-t">
+    <a href="/" class="hover:text-orange-500">← Înapoi la DAG Auto</a>
+    <span class="mx-3">|</span>
+    <a href="/contact" class="hover:text-orange-500">Contact</a>
+  </footer>
+
+</body>
+</html>

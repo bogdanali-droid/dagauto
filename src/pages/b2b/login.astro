@@ -1,0 +1,80 @@
+---
+import B2BLayout from '../../layouts/B2BLayout.astro';
+import { hashPassword, createB2BToken, setB2BCookie, getB2BToken, verifyB2BToken } from '../../lib/b2b-auth';
+
+const DB = Astro.locals.runtime?.env?.DB;
+const secret = Astro.locals.runtime?.env?.SESSION_SECRET || 'dev-secret-change-in-prod';
+
+const token = getB2BToken(Astro.request);
+if (token && await verifyB2BToken(token, secret)) {
+  return Astro.redirect('/b2b/dashboard');
+}
+
+let error = '';
+
+if (Astro.request.method === 'POST') {
+  const data = await Astro.request.formData();
+  const email = (data.get('email') as string || '').trim().toLowerCase();
+  const password = data.get('password') as string;
+
+  if (DB && email && password) {
+    const user = await DB.prepare(
+      'SELECT id, password_hash, status FROM b2b_users WHERE email = ?'
+    ).bind(email).first() as any;
+
+    if (user) {
+      const hash = await hashPassword(password);
+      if (hash === user.password_hash) {
+        if (user.status === 'pending') {
+          error = 'Contul tău este în așteptare. Va fi activat în maxim 24 ore.';
+        } else if (user.status === 'suspended') {
+          error = 'Contul tău a fost suspendat. Contactează DAG Auto.';
+        } else {
+          const newToken = await createB2BToken(user.id, secret);
+          return new Response(null, {
+            status: 302,
+            headers: {
+              'Location': '/b2b/dashboard',
+              'Set-Cookie': setB2BCookie(newToken),
+            },
+          });
+        }
+      } else {
+        error = 'Email sau parolă incorectă.';
+      }
+    } else {
+      error = 'Email sau parolă incorectă.';
+    }
+  }
+}
+---
+
+<B2BLayout title="Autentificare B2B">
+  <div class="max-w-md mx-auto px-4 py-12">
+    <div class="text-center mb-8">
+      <h1 class="text-3xl font-extrabold text-gray-800">Autentificare B2B</h1>
+      <p class="text-gray-500 mt-2">Intră în contul tău</p>
+    </div>
+    <div class="bg-white rounded-2xl shadow-md p-8">
+      {error && (
+        <div class="bg-red-50 border border-red-200 text-red-700 rounded-lg p-3 mb-6 text-sm">{error}</div>
+      )}
+      <form method="POST" class="space-y-4">
+        <div>
+          <label class="block text-sm font-semibold text-gray-700 mb-1">Email</label>
+          <input type="email" name="email" required autofocus class="form-input" />
+        </div>
+        <div>
+          <label class="block text-sm font-semibold text-gray-700 mb-1">Parolă</label>
+          <input type="password" name="password" required class="form-input" />
+        </div>
+        <button type="submit" class="w-full bg-orange-500 hover:bg-orange-600 text-white font-bold py-3 rounded-xl transition-colors text-lg">
+          Intră în cont →
+        </button>
+      </form>
+      <p class="text-center text-sm text-gray-400 mt-6">
+        Nu ai cont? <a href="/b2b/register" class="text-orange-500 font-semibold hover:underline">Înregistrează-te gratuit</a>
+      </p>
+    </div>
+  </div>
+</B2BLayout>

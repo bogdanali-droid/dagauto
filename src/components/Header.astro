@@ -9,6 +9,7 @@ const navLinks = [
   { href: '/blog', label: 'Blog' },
   { href: '/contact', label: 'Contact' },
 ];
+const b2bLink = { href: '/b2b', label: 'Vinde mașina' };
 ---
 
 <header class="bg-navy-900 text-white sticky top-0 z-50 shadow-lg" style="background-color: #0a1a33;">
@@ -46,6 +47,9 @@ const navLinks = [
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
           </svg>
           <span id="fav-count" class="hidden absolute -top-1 -right-1 bg-orange-500 text-white text-xs font-bold w-4 h-4 rounded-full flex items-center justify-center">0</span>
+        </a>
+        <a href="/b2b" class="text-sm font-semibold text-orange-400 hover:text-orange-300 transition-colors border border-orange-400/40 hover:border-orange-400 px-3 py-1.5 rounded-lg">
+          Vinde mașina
         </a>
         <a href="/parc-auto" class="btn-primary text-sm py-2 px-4">
           Vezi Mașini

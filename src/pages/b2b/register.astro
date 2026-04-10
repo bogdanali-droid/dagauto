@@ -1,0 +1,100 @@
+---
+import B2BLayout from '../../layouts/B2BLayout.astro';
+import { hashPassword, getB2BToken, verifyB2BToken } from '../../lib/b2b-auth';
+
+const DB = Astro.locals.runtime?.env?.DB;
+const secret = Astro.locals.runtime?.env?.SESSION_SECRET || 'dev-secret-change-in-prod';
+
+// Already logged in?
+const token = getB2BToken(Astro.request);
+if (token && await verifyB2BToken(token, secret)) {
+  return Astro.redirect('/b2b/dashboard');
+}
+
+let error = '';
+let success = false;
+
+if (Astro.request.method === 'POST') {
+  const data = await Astro.request.formData();
+  const email = (data.get('email') as string || '').trim().toLowerCase();
+  const password = data.get('password') as string;
+  const name = (data.get('name') as string || '').trim();
+  const phone = (data.get('phone') as string || '').trim();
+  const company = (data.get('company') as string || '').trim();
+
+  if (!email || !password || !name || !phone) {
+    error = 'Completează toate câmpurile obligatorii.';
+  } else if (password.length < 6) {
+    error = 'Parola trebuie să aibă minim 6 caractere.';
+  } else if (DB) {
+    const existing = await DB.prepare('SELECT id FROM b2b_users WHERE email = ?').bind(email).first();
+    if (existing) {
+      error = 'Există deja un cont cu acest email.';
+    } else {
+      const hash = await hashPassword(password);
+      await DB.prepare(
+        'INSERT INTO b2b_users (email, password_hash, name, phone, company, status) VALUES (?, ?, ?, ?, ?, ?)'
+      ).bind(email, hash, name, phone, company, 'pending').run();
+      success = true;
+    }
+  }
+}
+---
+
+<B2BLayout title="Înregistrare B2B">
+  <div class="max-w-md mx-auto px-4 py-12">
+    <div class="text-center mb-8">
+      <h1 class="text-3xl font-extrabold text-gray-800">Creează cont B2B</h1>
+      <p class="text-gray-500 mt-2">Gratuit · Activare în 24 ore</p>
+    </div>
+
+    {success ? (
+      <div class="bg-green-50 border border-green-200 rounded-2xl p-8 text-center">
+        <div class="text-5xl mb-4">✅</div>
+        <h2 class="text-xl font-bold text-green-700 mb-2">Cont creat cu succes!</h2>
+        <p class="text-green-600 mb-6">Echipa DAG Auto va verifica contul tău și îl va activa în maxim 24 de ore. Vei primi un email de confirmare.</p>
+        <a href="/b2b/login" class="bg-orange-500 hover:bg-orange-600 text-white font-bold px-6 py-3 rounded-xl transition-colors inline-block">
+          Mergi la autentificare →
+        </a>
+      </div>
+    ) : (
+      <div class="bg-white rounded-2xl shadow-md p-8">
+        {error && (
+          <div class="bg-red-50 border border-red-200 text-red-700 rounded-lg p-3 mb-6 text-sm">{error}</div>
+        )}
+        <form method="POST" class="space-y-4">
+          <div>
+            <label class="block text-sm font-semibold text-gray-700 mb-1">Nume și Prenume *</label>
+            <input type="text" name="name" required class="form-input" placeholder="Ion Popescu" />
+          </div>
+          <div>
+            <label class="block text-sm font-semibold text-gray-700 mb-1">Email *</label>
+            <input type="email" name="email" required class="form-input" placeholder="email@exemplu.ro" />
+          </div>
+          <div>
+            <label class="block text-sm font-semibold text-gray-700 mb-1">Telefon *</label>
+            <input type="tel" name="phone" required class="form-input" placeholder="07xx xxx xxx" />
+          </div>
+          <div>
+            <label class="block text-sm font-semibold text-gray-700 mb-1">Firmă (opțional)</label>
+            <input type="text" name="company" class="form-input" placeholder="SC Exemplu SRL" />
+          </div>
+          <div>
+            <label class="block text-sm font-semibold text-gray-700 mb-1">Parolă *</label>
+            <input type="password" name="password" required minlength="6" class="form-input" placeholder="Minim 6 caractere" />
+          </div>
+          <div class="flex items-start gap-2 text-sm text-gray-500 pt-2">
+            <input type="checkbox" required id="terms" class="mt-1 accent-orange-500" />
+            <label for="terms">Sunt de acord cu comisionul de <strong class="text-orange-500">15%</strong> aplicat la prețul mașinii</label>
+          </div>
+          <button type="submit" class="w-full bg-orange-500 hover:bg-orange-600 text-white font-bold py-3 rounded-xl transition-colors text-lg mt-2">
+            Creează cont →
+          </button>
+        </form>
+        <p class="text-center text-sm text-gray-400 mt-6">
+          Ai deja cont? <a href="/b2b/login" class="text-orange-500 font-semibold hover:underline">Autentifică-te</a>
+        </p>
+      </div>
+    )}
+  </div>
+</B2BLayout>

@@ -297,22 +297,37 @@ const schemaCar = {
                 Solicită Finanțare Acum →
               </a>
 
-              <!-- BT Direct Calculator CTA -->
-              <a
-                href="https://www.bancatransilvania.ro/persoane-fizice/credite/credite-auto/"
-                target="_blank"
-                rel="noopener"
-                class="flex items-center gap-3 p-4 rounded-xl border-2 border-blue-900 hover:bg-blue-900 hover:text-white transition-all group"
-                style="color: #0f2244;"
-              >
-                <div class="w-10 h-10 rounded-lg flex items-center justify-center shrink-0 bg-blue-900 group-hover:bg-white/20">
-                  <span class="text-white font-black text-sm" style="font-family:'Arial Black',sans-serif;letter-spacing:-0.5px;">BT</span>
-                </div>
-                <div>
-                  <div class="font-bold text-sm">Calculează la Banca Transilvania</div>
-                  <div class="text-xs opacity-60">Calculator rate credit auto oficial →</div>
-                </div>
-              </a>
+              <!-- BT + TBI Calculator CTAs -->
+              <div class="grid grid-cols-1 gap-2">
+                <a
+                  href="https://www.bancatransilvania.ro/persoane-fizice/credite/credite-auto/"
+                  target="_blank" rel="noopener"
+                  class="flex items-center gap-3 p-3 rounded-xl border-2 border-slate-800 hover:bg-slate-800 hover:text-white transition-all group"
+                  style="color: #0f2244;"
+                >
+                  <div class="w-9 h-9 rounded-lg flex items-center justify-center shrink-0 bg-slate-800">
+                    <span class="text-white font-black text-xs" style="font-family:'Arial Black',sans-serif;letter-spacing:-0.5px;">BT</span>
+                  </div>
+                  <div>
+                    <div class="font-bold text-sm">Calculator Banca Transilvania</div>
+                    <div class="text-xs opacity-50">Credit auto · rate fixe →</div>
+                  </div>
+                </a>
+                <a
+                  href="https://www.tbi.ro/credite/credit-auto/"
+                  target="_blank" rel="noopener"
+                  class="flex items-center gap-3 p-3 rounded-xl border-2 border-blue-700 hover:bg-blue-700 hover:text-white transition-all group"
+                  style="color: #1d4ed8;"
+                >
+                  <div class="w-9 h-9 rounded-lg flex items-center justify-center shrink-0 bg-blue-700">
+                    <span class="text-white font-black text-xs" style="font-family:'Arial Black',sans-serif;letter-spacing:-0.5px;">TBI</span>
+                  </div>
+                  <div>
+                    <div class="font-bold text-sm">Calculator TBI Bank</div>
+                    <div class="text-xs opacity-50">Aprobare rapidă · avans minim →</div>
+                  </div>
+                </a>
+              </div>
             </div>
           </div>
 
@@ -361,16 +376,26 @@ const schemaCar = {
                 class="btn-secondary w-full text-center block">
                 💳 Calculează Rata
               </a>
-              <a
-                href={`https://www.bancatransilvania.ro/persoane-fizice/credite/credite-auto/`}
-                target="_blank"
-                rel="noopener"
-                class="flex items-center justify-center gap-2 w-full py-3 px-4 rounded-lg font-semibold text-sm transition-colors border-2 border-blue-900 hover:bg-blue-900 hover:text-white text-blue-900"
-                style="background: white;"
-              >
-                <span class="font-black text-base" style="letter-spacing:-0.5px;">BT</span>
-                Calculator Rate Banca Transilvania
-              </a>
+              <div class="grid grid-cols-2 gap-2">
+                <a
+                  href="https://www.bancatransilvania.ro/persoane-fizice/credite/credite-auto/"
+                  target="_blank"
+                  rel="noopener"
+                  class="flex items-center justify-center gap-1.5 py-2.5 px-3 rounded-lg font-bold text-xs transition-colors border-2 border-slate-800 hover:bg-slate-800 hover:text-white text-slate-800 bg-white"
+                >
+                  <span class="font-black text-sm" style="letter-spacing:-0.5px; font-family:'Arial Black',sans-serif;">BT</span>
+                  Rate BT
+                </a>
+                <a
+                  href="https://www.tbi.ro/credite/credit-auto/"
+                  target="_blank"
+                  rel="noopener"
+                  class="flex items-center justify-center gap-1.5 py-2.5 px-3 rounded-lg font-bold text-xs transition-colors border-2 border-blue-700 hover:bg-blue-700 hover:text-white text-blue-700 bg-white"
+                >
+                  <span class="font-black text-sm" style="letter-spacing:-0.5px; font-family:'Arial Black',sans-serif;">TBI</span>
+                  Rate TBI
+                </a>
+              </div>
               <a href={`/programeaza-vizita?masina=${encodeURIComponent(car.title)}`}
                 class="btn-outline w-full text-center block">
                 📅 Programează Vizită
